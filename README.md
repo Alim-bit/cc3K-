@@ -4,8 +4,8 @@
 
 
 Work:
-Alim - item and it’s classes
-Luka - enemy and it’s classes
-Sunae - player and the rest of the classes
+### Alim - item and it’s classes
+### Luka - enemy and it’s classes
+### Sunae - player and the rest of the classes
 
-textdisplay, view , controller, floor, cell
+### textdisplay, view , controller, floor, cell

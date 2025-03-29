@@ -18,6 +18,8 @@ char Enemy::getSymbol() { return symbol; }
 
 bool Enemy::getMoved() { return hasMoved; }
 
+bool Enemy::isHostile() { return true; }
+
 void Enemy::setPos(int newX, int newY) {
     x = newX;
     y = newY;

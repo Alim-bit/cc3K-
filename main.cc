@@ -70,6 +70,9 @@ int main() {      // will need cmd line args at some point
                 continue;
             }
 
+            mainGame->enemyRound();	
+            mainGame->displayGame();
+            
             // end game clauses
             if (mainGame->getCurrentFloor() > 5) {
                 cout <<"Congratulations, you have beaten the game!" << endl;
@@ -80,9 +83,7 @@ int main() {      // will need cmd line args at some point
                 cout << "You have been slain." << endl;
                 break;
             }
-
-	        mainGame->enemyRound();	
-            mainGame->displayGame();	
+	
         }
 
         // final score generation

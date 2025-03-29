@@ -10,7 +10,9 @@ class Merchant : public Enemy {
 
   public:
     Merchant();
+    
     void makeHostile();
+    bool isHostile();
 };
 
 #endif

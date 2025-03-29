@@ -25,6 +25,7 @@ public:
     std::string getName();
     char getSymbol();
     bool getMoved();
+    virtual bool isHostile();
 
     void setPos(int newX, int newY);
     int getX();

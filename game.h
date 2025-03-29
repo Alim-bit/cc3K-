@@ -7,6 +7,7 @@
 #include "playerChar.h"
 #include "enemy.h"
 #include "enemyFactory.h"
+#include <sstream>
 #include <utility>
 #include <vector>
 #include <memory>
@@ -68,7 +69,7 @@ public:
         int playerX = playerCoords.at(0);
         int playerY = playerCoords.at(1);
 
-        // get random spawn for player
+        // get random spawn for stairs
         vector<vector<int>> stairsChamberBounds = curFloor->getChamberBounds(stairsSpawn);
         vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds, seed);
         int stairsX = stairsCoords.at(0);
@@ -245,24 +246,41 @@ public:
 	        bool attack = false;
 	        string actionResult;
 
-	        // get enemies' potential moves, stop if player is found
+	        // get enemy's potential moves, stop if player is found
+            // unless enemy is a merchant/dragon and is not hostile
 	        for (int i = curX-1; i <= curX+1; i++) {
             	for (int j = curY-1; j <= curY+1; j++) {
 	    	        if (i != curX || j != curY) {
 		    	        if (curFloor->getTile(i, j)->getType() == "empty") {
 			                validMoves.emplace_back(make_pair(i,j));
-		   	            } else if (curFloor->getTile(i, j)->getType() == "player") {
-			                attack = true;
-			                break;
+		   	            } else if (enemy->isHostile()) {
+                            if (curFloor->getTile(i, j)->getType() == "player") {
+			                    attack = true;
+			                    break;
+                            }
 		    	        }
 	    	        }
             	}
     	    }
 
 	        if (attack) {
-		        // attack goes here
-		        // placeholder
-		        actionResult = "Enemy attacks now.";
+		        // for now they always hit, but
+                // enemy attacks have 50% accuracy
+                // let's say 0-49 is miss, 50-99 is hit
+                int rand = 50;
+                if (rand > 49) {
+                    // The extra (100 + player DEF - 1) is there so it rounds up
+                    int damage = ((100 + 100 + getPlayer()->getDEF() - 1)/(100 + getPlayer()->getDEF())) * enemy->getATK();
+                    // if (BarrierSuit) {
+                    // damage = ceil(damage / 2) 
+                    // }
+                    ostringstream oss;
+                    oss << enemy->getSymbol() << " deals " << damage << " damage to PC.";
+                    actionResult += oss.str();
+                } else {
+		            actionResult += enemy->getSymbol();
+                    actionResult += " attacks PC but misses.";
+                }
 		        setCommandLine(actionResult);
 	        } else {
 	    	    // pick a direction and go in it

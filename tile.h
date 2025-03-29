@@ -57,6 +57,10 @@ public:
             default: return '?'; break;
         }
     }
+
+    void setType(Type newType) {
+        type = newType;
+    }
 };
 
 #endif

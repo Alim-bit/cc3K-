@@ -11,8 +11,10 @@ protected:
     int ATK;
     int DEF;
 
+    int x, y;
+
 public:
-    PlayerChar( std::string race, int maxhp, int hp, int atk, int def, int floor );
+    PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
     virtual ~PlayerChar() = default;
     // virtual void playerAbility() = 0;
 
@@ -20,6 +22,10 @@ public:
     int getATK();
     int getDEF();
     std::string getRace();
+
+    void setPos(int newX, int newY);
+    int getX();
+    int getY();
 };
 
 #endif

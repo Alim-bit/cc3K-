@@ -12,7 +12,7 @@ int main() {      // will need cmd line args at some point
 
     while (true) {
         cout << "Choose your character's race from the following:" << endl;
-        cout << "Human (H), Dwarf (D), Elf (E), Orc (O), or Quit." << endl;
+        cout << "Human (h), Dwarf (d), Elf (e), Orc (o), or Quit." << endl;
         cout << "My choice:" << endl;
 
         string race;
@@ -28,25 +28,50 @@ int main() {      // will need cmd line args at some point
 
         shared_ptr<Game> mainGame = make_shared<Game>(player);
         shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
+        mainGame->initFloor();
         mainGame->displayGame();
 
         string command;
         while (cin >> command) { // GAME SIM
+            
+            // game commands
 
-            cout << "game is playing" << endl; // test
+            // MOVE
+            if (command == "no" || command == "so" || command == "ea" || command == "we"
+                || command == "ne" || command == "nw" || command == "se" || command == "sw") {
+                
+                mainGame->move(command);
 
-            // assume commands happen here
+            // USE POTION IN DIRECTION
+            } else if (command == "u") {
+                cin >> command;
 
+                // implement use potion method
 
+            // ATTACK ENEMY IN DIRECTION
+            } else if (command == "a") {
+                cin >> command;
 
-            //
+                // implement attack method
 
-            if (player->getHP() <= 0) {
-                cout << "You have been slain." << endl;
+            // QUIT/RESTART
+            } else if (command == "q" || command == "r") {
+                break;
+
+            // INVALID COMMAND
+            } else {
+                cout << "Invalid option, try again." << endl;
+                continue;
+            }
+
+            // end game clauses
+            if (mainGame->getCurrentFloor() > 5) {
+                cout <<"Congratulations, you have beaten the game!" << endl;
                 break;
             }
 
-            if (command == "q" || command == "r") {
+            if (player->getHP() <= 0) {
+                cout << "You have been slain." << endl;
                 break;
             }
         }

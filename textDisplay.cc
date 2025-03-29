@@ -32,7 +32,7 @@ void TextDisplay::notify() {
     cout << "HP: " << player->getHP() << endl;
     cout << "Atk: " << player->getATK() << endl;
     cout << "Def: " << player->getDEF() << endl;
-    cout << "Action: " << endl; // need to add a way to keep track of actions
+    cout << "Action: " << subject->getCommandLine() << endl; 
 }
 
 TextDisplay::~TextDisplay() {

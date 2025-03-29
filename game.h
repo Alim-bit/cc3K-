@@ -108,16 +108,66 @@ public:
         } 
 
         string actionResult;
+        shared_ptr<Floor> curFloor = getFloor(currentFloor);
         
-        // check if valid
-        shared_ptr<Tile> nextTile = getFloor(currentFloor)->getTile(tempX, tempY);
+        // check nextTile validity
+        shared_ptr<Tile> nextTile = curFloor->getTile(tempX, tempY);
         string nextTileType = nextTile->getType();
+
+        // if empty
         if (nextTileType == "empty") {
             nextTile->setType(Tile::PLAYER);
             player->setPos(tempX, tempY);
-            getFloor(currentFloor)->getTile(curX, curY)->setType(Tile::EMPTY);
+            curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
             
             actionResult = "PC moves " + direction;
+        
+        // if passage
+        } else if (nextTileType == "passage") {
+            nextTile->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+            curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
+            
+            actionResult = "PC crawls " + direction;
+
+        // if door
+        } else if (nextTileType == "door") {
+            if (player->isInPassage()) {
+                // find empty tile
+                if (curFloor->getTile(tempX + 1, tempY)->getType() == "empty") {
+                    tempX += 1;
+                } else if (curFloor->getTile(tempX - 1, tempY)->getType() == "empty") {
+                    tempX -= 1;
+                } else if (curFloor->getTile(tempX, tempY + 1)->getType() == "empty") {
+                    tempY += 1;
+                } else {
+                    tempY -= 1;
+                }
+
+                curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
+                player->setInPassage(false);
+                actionResult = "PC crawled out of the passage";
+
+            } else {
+                // find passage tile
+                if (curFloor->getTile(tempX + 1, tempY)->getType() == "passage") {
+                    tempX += 1;
+                } else if (curFloor->getTile(tempX - 1, tempY)->getType() == "passage") {
+                    tempX -= 1;
+                } else if (curFloor->getTile(tempX, tempY + 1)->getType() == "passage") {
+                    tempY += 1;
+                } else {
+                    tempY -= 1;
+                }
+
+                curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+                player->setInPassage(true);
+                actionResult = "PC entered a passage";
+            }
+
+            curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+            
         } else {
             actionResult = "You are trying to move out of bounds, try again.";
         } // more else ifs depending on what the tile is

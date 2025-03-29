@@ -12,6 +12,7 @@ protected:
     int DEF;
 
     int x, y;
+    bool inPassage;
 
 public:
     PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
@@ -26,6 +27,8 @@ public:
     void setPos(int newX, int newY);
     int getX();
     int getY();
+    bool isInPassage();
+    void setInPassage(bool inout);
 };
 
 #endif

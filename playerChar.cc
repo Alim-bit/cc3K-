@@ -4,7 +4,7 @@
 using namespace std;
 
 PlayerChar::PlayerChar( string race, int maxhp, int hp, int atk, int def, int floor ) 
-: race{race}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0} {}
+: race{race}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0}, inPassage{false} {}
 
 int PlayerChar::getHP() { return HP; }
 
@@ -25,4 +25,12 @@ int PlayerChar::getX() {
 
 int PlayerChar::getY() {
     return y;
+}
+
+bool PlayerChar::isInPassage() {
+    return inPassage;
+}
+
+void PlayerChar::setInPassage(bool inout) {
+    inPassage = inout;
 }

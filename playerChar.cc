@@ -14,6 +14,10 @@ int PlayerChar::getDEF() { return DEF; }
 
 string PlayerChar::getRace() { return race; }
 
+void PlayerChar::setHP(int newHP) {
+    HP = newHP;
+}
+
 void PlayerChar::setPos(int newX, int newY) {
     x = newX;
     y = newY;

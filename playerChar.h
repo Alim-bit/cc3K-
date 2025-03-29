@@ -24,6 +24,7 @@ public:
     int getDEF();
     std::string getRace();
 
+    void setHP(int newHP);
     void setPos(int newX, int newY);
     int getX();
     int getY();

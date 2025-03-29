@@ -274,6 +274,7 @@ public:
                     // if (BarrierSuit) {
                     // damage = ceil(damage / 2) 
                     // }
+                    getPlayer()->setHP(getPlayer()->getHP() - damage);
                     ostringstream oss;
                     oss << enemy->getSymbol() << " deals " << damage << " damage to PC.";
                     actionResult += oss.str();

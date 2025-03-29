@@ -64,7 +64,7 @@ public:
     }
 
     void setEnemy(shared_ptr<Enemy> newEnemy) {
-	enemy = newEnemy;
+	    enemy = newEnemy;
     }
 
 };

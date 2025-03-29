@@ -75,8 +75,8 @@ int main() {      // will need cmd line args at some point
                 break;
             }
 
-	    mainGame->enemyRound();		
-
+	        mainGame->enemyRound();	
+            mainGame->displayGame();	
         }
 
         // ending bit

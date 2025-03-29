@@ -5,6 +5,9 @@
 #include "floor.h"
 #include "tile.h"
 #include "playerChar.h"
+#include "enemy.h"
+#include "enemyFactory.h"
+#include <utility>
 #include <vector>
 #include <memory>
 
@@ -38,6 +41,17 @@ public:
         player->setPos(x, y);
 
         // init potions, enemies, and stairs
+
+	// testing an enemy spawn
+	x = 27;
+	y = 6;
+
+        // no randomness yet, only generates werewolf
+	shared_ptr<Enemy> enemyTest = EnemyFactory::createEnemy();
+	getFloor(currentFloor)->getTile(x, y)->setType(Tile::ENEMY); // sets enemyTest spawn
+        getFloor(currentFloor)->getTile(x, y)->setEnemy(enemyTest);
+	enemyTest->setPos(x, y);
+	
     }
 
     int getCurrentFloor() {
@@ -173,7 +187,71 @@ public:
         } // more else ifs depending on what the tile is
 
         setCommandLine(actionResult);
-        displayGame();
+    }
+
+    void enemyMove(shared_ptr<Enemy> enemy) {
+	if (!(enemy->getMoved())) {
+	    int curX = enemy->getX();
+            int curY = enemy->getY();
+
+	    shared_ptr<Floor> curFloor = getFloor(currentFloor);
+	    vector<pair<int, int>> validMoves;
+	    bool attack = false;
+	    string actionResult;
+
+	    // get enemies' potential moves, stop if player is found
+	    for (int i = curX-1; i <= curX+1; i++) {
+            	for (int j = curY-1; j <= curY+1; j++) {
+	    	    if (i != curX || j != curY) {
+		    	if (curFloor->getTile(i, j)->getType() == "empty") {
+			    validMoves.emplace_back(make_pair(i,j));
+		   	} else if (curFloor->getTile(i, j)->getType() == "player") {
+			    attack = true;
+			    break;
+		    	}
+	    	    }
+            	}
+    	    }
+
+	    if (attack) {
+		// attack goes here
+		// placeholder
+		actionResult = "Enemy attacks now.";
+		setCommandLine(actionResult);
+	    } else {
+	    	// pick a direction and go in it
+	    	// would be generated between 0 and
+	    	// surroundings.size()
+	    	int rand = 0;
+	    	shared_ptr<Tile> nextTile = curFloor->getTile(validMoves[rand].first, validMoves[rand].second);
+	    	nextTile->setType(Tile::ENEMY);
+		nextTile->setEnemy(enemy);
+            	enemy->setPos(validMoves[rand].first, validMoves[rand].second);
+            	curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+	    }
+
+	    enemy->setMoved();
+	}
+    }
+
+    void enemyRound() {
+	shared_ptr<Floor> curFloor = getFloor(currentFloor);    
+    	for (int i = 0; i < 79; i++) {
+	    for (int j = 0; j < 25; j++) {
+	        if (curFloor->getTile(i,j)->getType() == "enemy") {
+		    enemyMove(curFloor->getTile(i,j)->enemy);
+		}    
+	    }
+	}
+
+	for (int i = 0; i < 79; i++) {
+            for (int j = 0; j < 25; j++) {
+                if (curFloor->getTile(i,j)->getType() == "enemy") {	
+                    curFloor->getTile(i,j)->enemy->resetMoved();
+                }
+            }
+        }
+        displayGame();	
     }
 
 };

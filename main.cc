@@ -74,6 +74,9 @@ int main() {      // will need cmd line args at some point
                 cout << "You have been slain." << endl;
                 break;
             }
+
+	    mainGame->enemyRound();		
+
         }
 
         // ending bit

@@ -2,6 +2,7 @@
 #define TILE_H
 
 #include <string>
+#include "enemy.h"
 
 class Tile {
 
@@ -15,7 +16,7 @@ public:
     // "thing": player, enemy or item.
 
     Type type;
-    // shared_ptr<Enemy> Enemy;
+    shared_ptr<Enemy> enemy;
     // shared_ptr<Item> Item;
 
     int x, y;
@@ -52,7 +53,7 @@ public:
             case STAIRS: return (stairsVisible) ? '/' : '.'; break;
             case EMPTY: return '.'; break;
             case PLAYER: return '@'; break;
-            // case ENEMY: return Enemy->getSymbol(); break;
+            case ENEMY: return enemy->getSymbol(); break;
             // case ITEM: return Item->getSymbol; break;
             default: return '?'; break;
         }
@@ -61,6 +62,11 @@ public:
     void setType(Type newType) {
         type = newType;
     }
+
+    void setEnemy(shared_ptr<Enemy> newEnemy) {
+	enemy = newEnemy;
+    }
+
 };
 
 #endif

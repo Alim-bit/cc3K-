@@ -2,34 +2,45 @@
 
 ## AVOID PUSHING .o and .d FILES!! ALSO ANY EXECUTABLE YOU MAKE!!
 
+---
+
 ## Work Division:
-### Alim - item and it’s classes
-### Luka - enemy and it’s classes
-### Sunae - player and the rest of the classes
+- **Alim** - Item and its classes
+- **Luka** - Enemy and its classes
+- **Sunae** - Player and the rest of the classes
 
-### Notes:
-### - the action line should be implemented within the action method by calling setCommandLine after creating the appropriate string
+---
 
-### Things do do:
-### - player ability must be applied correctly
-### - random player spawn (stairs must be spawned in seperate chamber)
-### - proper generation order
-### - player score generation (humans get 50% boost)
+## Notes:
+- The action line should be implemented within the `action` method by calling `setCommandLine` after creating the appropriate string.
 
-### - Enemy class:
-###     - enemy generation
-###     - enemy random movement "Note that enemies should be moved in a line by line fashion"
-###     - hoard spawns 
-###     - merchant/dragon specific behaviour
-###     - player vs enemy battle mechanics
-###     - enemy character display in tile class
+---
 
-### - Items class:
-###     - potion generation
-###     - use potion method implementation (must be within 1 block radius of potion)
-###     - potions are unknown until used or bought from merchant
-###     - implement permanent vs temp potions (stats cannot drop below 0), (temp potions are gone when entering new floor)
-###     - item character display in tile class
-###     - treasure generation (implement enemy behaviour of dragons/merchant)
-###     - implement major items
-### 
+## Things to Do:
+
+### **Player Mechanics**
+- Player ability must be applied correctly
+- Random player spawn (stairs must be spawned in a separate chamber)
+- Proper generation order
+- Player score generation (humans get a 50% boost)
+
+### **Enemy Class**
+- Enemy generation
+- Enemy random movement ("Note that enemies should be moved in a line-by-line fashion")
+- Hoard spawns
+- Merchant/Dragon specific behavior
+- Player vs Enemy battle mechanics
+- Enemy character display in `Tile` class
+
+### **Items Class**
+- Potion generation
+- Implement `usePotion` method (must be within 1 block radius of potion)
+- Potions are unknown until used or bought from a merchant
+- Implement permanent vs temp potions:
+  - Stats cannot drop below 0
+  - Temp potions disappear when entering a new floor
+- Item character display in `Tile` class
+- Treasure generation (implement enemy behavior of Dragons/Merchants)
+- Implement major items
+
+---

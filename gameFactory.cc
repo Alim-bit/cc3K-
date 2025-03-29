@@ -9,10 +9,10 @@
 
 using namespace std;
 
-unique_ptr<PlayerChar> GameFactory::createPlayer( const string &race ) {
-    if (race == "H") { return make_unique<Human>(); }
-    else if (race == "D") { return make_unique<Dwarf>(); }
-    else if (race == "E") { return make_unique<Elf>(); }
-    else if (race == "O") { return make_unique<Orc>(); }
+shared_ptr<PlayerChar> GameFactory::createPlayer( const string &race ) {
+    if (race == "H") { return make_shared<Human>(); }
+    else if (race == "D") { return make_shared<Dwarf>(); }
+    else if (race == "E") { return make_shared<Elf>(); }
+    else if (race == "O") { return make_shared<Orc>(); }
     else { return nullptr; }
 }

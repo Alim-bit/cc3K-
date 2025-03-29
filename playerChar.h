@@ -5,20 +5,21 @@
 class PlayerChar {
 
 protected:
-    std::string name;
+    std::string race;
     int MAXHP;
     int HP;
     int ATK;
     int DEF;
-    int floor;
 
 public:
-    PlayerChar( std::string name, int maxhp, int hp, int atk, int def, int floor );
+    PlayerChar( std::string race, int maxhp, int hp, int atk, int def, int floor );
     virtual ~PlayerChar() = default;
     // virtual void playerAbility() = 0;
 
     int getHP();
-    int getFloor();
+    int getATK();
+    int getDEF();
+    std::string getRace();
 };
 
 #endif

@@ -9,7 +9,7 @@ class GameFactory {
 
 public:
     // returns a race specific player, if race is invalid then returns nullptr
-    static std::unique_ptr<PlayerChar> createPlayer( const std::string &race );
+    static std::shared_ptr<PlayerChar> createPlayer( const std::string &race );
 };
 
 #endif

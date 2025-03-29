@@ -6,19 +6,23 @@
 #include "textDisplay.h"
 #include "gameFactory.h"
 
+#include <algorithm>
+#include <random>
+#include <chrono>
+
 using namespace std;
 
 int main() {      // will need cmd line args at some point
 
     while (true) {
         cout << "Choose your character's race from the following:" << endl;
-        cout << "Human (h), Dwarf (d), Elf (e), Orc (o), or Quit." << endl;
+        cout << "Human (h), Dwarf (d), Elf (e), Orc (o), or Quit (q)." << endl;
         cout << "My choice:" << endl;
 
         string race;
         cin >> race;
 
-        if (race == "Quit") { break; }
+        if (race == "q") { break; }
         shared_ptr<PlayerChar> player = GameFactory::createPlayer(race);
         
         if (!player) {
@@ -26,7 +30,9 @@ int main() {      // will need cmd line args at some point
             continue;
         }
 
-        shared_ptr<Game> mainGame = make_shared<Game>(player);
+        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+
+        shared_ptr<Game> mainGame = make_shared<Game>(player, seed);
         shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
         mainGame->initFloor();
         mainGame->displayGame();
@@ -78,6 +84,10 @@ int main() {      // will need cmd line args at some point
 	        mainGame->enemyRound();	
             mainGame->displayGame();	
         }
+
+        // final score generation
+        int finalScore = (player->getRace() == "Human") ? (mainGame->getGoldScore() * 1.5) : mainGame->getGoldScore();
+        cout << "Final Score: " << finalScore << endl;
 
         // ending bit
         if (command == "q") {

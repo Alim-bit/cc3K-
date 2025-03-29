@@ -11,6 +11,7 @@ public:
         WS, VWALL, HWALL, PASSAGE, DOOR, STAIRS, EMPTY, PLAYER, ENEMY, ITEM
     };
 
+protected:
     // a tile can be any of:
     // whitespace, vWall (Vertical), hWall (Horizontal), passage, door, stairs, empty or
     // "thing": player, enemy or item.
@@ -20,7 +21,7 @@ public:
     // shared_ptr<Item> Item;
 
     int x, y;
-    bool stairsVisible;
+    bool stairsVisible = false;
 
 public:
 
@@ -65,6 +66,14 @@ public:
 
     void setEnemy(shared_ptr<Enemy> newEnemy) {
 	    enemy = newEnemy;
+    }
+
+    shared_ptr<Enemy> getEnemy() {
+        return enemy;
+    }
+
+    void setStairsVisible() {
+        stairsVisible = true;
     }
 
 };

@@ -20,9 +20,7 @@
 
 ### **Player Mechanics**
 - Player ability must be applied correctly
-- Random player spawn (stairs must be spawned in a separate chamber)
-- Proper generation order
-- Player score generation (humans get a 50% boost)
+- Proper generation order (IN PROGRESS)
 
 ### **Enemy Class**
 - Enemy generation

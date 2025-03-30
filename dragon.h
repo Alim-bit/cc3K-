@@ -10,6 +10,7 @@ class Dragon : public Enemy {
 public:
     Dragon();
 
+    void resetHostile();
     void makeHostile();
     bool isHostile();
 };

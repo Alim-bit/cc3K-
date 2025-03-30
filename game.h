@@ -433,7 +433,7 @@ public:
                     shared_ptr<Item> compass = ItemFactory::createItem("C");
                     attackTile->setType(Tile::ITEM);
                     attackTile->setItem(compass);
-                    compass.setPos(tempX, tempY);
+                    compass->setPos(tempX, tempY);
                 }
 
                 // Enemy is a merchant, drops merchant hoard
@@ -441,7 +441,7 @@ public:
                     shared_ptr<Item> newMerchHoard = ItemFactory::createItem("MH");
                     attackTile->setType(Tile::ITEM);
                     attackTile->setItem(newMerchHoard);
-                    cnewMerchHoard.setPos(tempX, tempY);
+                    newMerchHoard->setPos(tempX, tempY);
                 }
 
                 // Enemy is not merchant/dragon
@@ -457,8 +457,14 @@ public:
 
             // if enemy is not defeated
             } else {
+
                 oss << "PC deals " << damage << " damage to " << enemy->getSymbol() << " (" << enemy->getHP() << " HP).";
                 actionResult += oss.str();
+            }
+            // makes all merchants permanently hostile, and the attacked dragon
+            // hostile for the next turn
+            if (enemy->getName() == "Merchant" || enemy->getName() == "Dragon") {
+                enemy->makeHostile();
             }
 
         // if empty    
@@ -476,6 +482,12 @@ public:
     }
 
     void enemyMove(shared_ptr<Enemy> enemy) {
+        // If enemy->getName() == "Dragon"
+        // check its associated protectedItem
+        // to see if the player is around it.
+        // If so, become hostile.
+
+
 	    if (!(enemy->getMoved())) {
 	        int curX = enemy->getX();
             int curY = enemy->getY();
@@ -492,6 +504,8 @@ public:
 	    	        if (i != curX || j != curY) {
 		    	        if (curFloor->getTile(i, j)->getType() == "empty") {
 			                validMoves.emplace_back(make_pair(i,j));
+                        
+                        // enemies only look for player if they are hostile
 		   	            } else if (enemy->isHostile()) {
                             if (curFloor->getTile(i, j)->getType() == "player") {
 			                    attack = true;
@@ -510,34 +524,46 @@ public:
                 if (rand > 49) {
                     // The extra (100 + player DEF - 1) is there so it rounds up
                     int damage = ((100 + 100 + player->getDEF() - 1)/(100 + player->getDEF())) * enemy->getATK();
+
                     // if (BarrierSuit) {
                     // damage = ceil(damage / 2) 
                     // }
+
                     player->setHP(player->getHP() - damage);
                     ostringstream oss;
                     oss << " " << enemy->getSymbol() << " deals " << damage << " damage to PC.";
                     actionResult += oss.str();
+
                 } else {
                     actionResult += " ";
 		            actionResult += enemy->getSymbol();
                     actionResult += " attacks PC but misses.";
+
                 }
+
 		        setEnemyCommandLine(actionResult);
+
 	        } else {
 	    	    // randomly selects a move out of validMoves
-		        if (validMoves.size() != 0) {
-			        shuffle(validMoves.begin(), validMoves.end(), rng);
-			        pair<int, int> newCoords = validMoves.at(0);
-			        shared_ptr<Tile> nextTile = curFloor->getTile(newCoords.first, newCoords.second);
-                   
-			        nextTile->setType(Tile::ENEMY);
-			        nextTile->setEnemy(enemy);
-			        enemy->setPos(newCoords.first, newCoords.second);
-			        curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
-                    curFloor->getTile(curX, curY)->setEnemy(nullptr);
+                // unless enemy is Dragon, which doesn't move
+                if (!(enemy->getName() == "Dragon")) {
+                    if (validMoves.size() != 0) {
+                        shuffle(validMoves.begin(), validMoves.end(), rng);
+                        pair<int, int> newCoords = validMoves.at(0);
+                        shared_ptr<Tile> nextTile = curFloor->getTile(newCoords.first, newCoords.second);
+                    
+                        nextTile->setType(Tile::ENEMY);
+                        nextTile->setEnemy(enemy);
+                        enemy->setPos(newCoords.first, newCoords.second);
+                        curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+                        curFloor->getTile(curX, curY)->setEnemy(nullptr);
+                    }
                 }
 	        }
-
+            //
+            if (enemy->getName() == "Dragon") {
+                enemy->resetHostile();
+            }
 	        enemy->setMoved();
 	    }
     }

@@ -26,6 +26,10 @@ public:
     std::string getName();
     char getSymbol();
     bool getMoved();
+    // for dragon and merchant
+    virtual void makeHostile();
+    //just for dragon
+    virtual void resetHostile();
     virtual bool isHostile();
 
     void setHP(int newHP);

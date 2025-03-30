@@ -20,6 +20,11 @@ bool Enemy::getMoved() { return hasMoved; }
 
 bool Enemy::isHostile() { return true; }
 
+// Intentionally empty for enemy types
+// that aren't dragon or merchant
+void Enemy::makeHostile() {  }
+void Enemy::resetHostile() {  }
+
 void Enemy::setHP(int newHP) {
     HP = newHP;
 }

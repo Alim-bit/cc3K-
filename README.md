@@ -28,7 +28,6 @@
 
 ### **Enemy Class**
 - Merchant/Dragon specific behavior
-- Implementation of Merchants dropping merchant hoards/an enemy dropping compass on death
 
 ### **Items Class**
 - Implement `usePotion` method (must be within 1 block radius of potion)

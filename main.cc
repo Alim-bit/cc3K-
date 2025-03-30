@@ -72,9 +72,12 @@ int main() {      // will need cmd line args at some point
                 continue;
             }
 
-            mainGame->enemyRound();	
-            mainGame->displayGame();
-            
+            // game continues as long as we are on floor 5 or above
+            if (mainGame->getCurrentFloor() <= 5) {
+                mainGame->enemyRound();	
+                mainGame->displayGame();
+            }
+
             // end game clauses
             if (mainGame->getCurrentFloor() > 5) {
                 cout <<"Congratulations, you have beaten the game!" << endl;

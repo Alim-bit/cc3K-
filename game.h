@@ -346,9 +346,11 @@ public:
             
         } else if (nextTileType == "stairs") {
             currentFloor += 1;
-            initFloor();
 
-            actionResult = "You have made it to floor" + to_string(currentFloor);
+            if (currentFloor <= 5) { // as long as we aren't at the 5th floor yet, since otherwise we beat the game moving to the 6th
+                initFloor();
+                actionResult = "You have made it to floor " + to_string(currentFloor);
+            }
 
         } else {
             actionResult = "You are trying to move out of bounds, try again.";

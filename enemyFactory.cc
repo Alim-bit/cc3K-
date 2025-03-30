@@ -12,18 +12,14 @@
 
 using namespace std;
 
-shared_ptr<Enemy> EnemyFactory::createEnemy() {
-    // right now this only generates werewolves
-    // generate # between 1-18 here
-    int rand = 1; 
-
+shared_ptr<Enemy> EnemyFactory::createEnemy(int rand) {
+    // generate # between 1-18 
     if (rand <= 4) { return make_shared<Werewolf>(); }
     else if (rand > 4 && rand < 8) { return make_shared<Vampire>(); }
     else if (rand > 7 && rand < 13) { return make_shared<Goblin>(); }
     else if (rand > 12 && rand < 15) { return make_shared<Troll>(); }
     else if (rand > 14 && rand < 17) { return make_shared<Phoenix>(); }
     else { return make_shared<Merchant>(); }
-
 }
 
 shared_ptr<Enemy> EnemyFactory::createDragon() {

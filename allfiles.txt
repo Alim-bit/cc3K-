@@ -1,0 +1,1210 @@
+#ifndef DRAGON_H
+#define DRAGON_H
+#include <string>
+
+#include "enemy.h"
+
+class Dragon : public Enemy {
+    bool hostile;
+
+public:
+    Dragon();
+
+    void makeHostile();
+    bool isHostile();
+};
+
+#endif
+#ifndef DWARF_H
+#define DWARF_H
+#include <string>
+
+#include "playerChar.h"
+
+class Dwarf : public PlayerChar {
+
+public:
+    Dwarf();
+    // void playerAbility() override;
+};
+
+#endif
+#ifndef ELF_H
+#define ELF_H
+#include <string>
+
+#include "playerChar.h"
+
+class Elf : public PlayerChar {
+
+public:
+    Elf();
+    // void playerAbility() override;
+};
+
+#endif
+#ifndef ENEMY_H
+#define ENEMY_H
+#include <string>
+
+class Enemy {
+
+protected:
+    std::string name;
+    char symbol;
+    int MAXHP;
+    int HP;
+    int ATK;
+    int DEF;
+  
+    int x, y;
+    bool hasMoved;
+
+public:
+    Enemy(std::string name, char symbol, int maxhp, int hp, int atk, int def);
+    virtual ~Enemy() = default;
+
+    int getHP();
+    int getATK();
+    int getDEF();
+    std::string getName();
+    char getSymbol();
+    bool getMoved();
+    virtual bool isHostile();
+
+    void setPos(int newX, int newY);
+    int getX();
+    int getY();
+    void setMoved();
+    void resetMoved();
+
+};
+
+#endif
+#ifndef ENEMYFACTORY_H
+#define ENEMYFACTORY_H
+#include <string>
+#include <memory>
+
+#include "enemy.h"
+
+class EnemyFactory {
+
+public:
+    // returns a random enemy (excluding dragon)
+    static std::shared_ptr<Enemy> createEnemy();
+    
+    // returns a dragon
+    static std::shared_ptr<Enemy> createDragon();
+};
+
+#endif#ifndef FLOOR_H
+#define FLOOR_H
+
+#include "tile.h"
+#include <vector>
+#include <memory>
+#include <string>
+
+class Floor {
+
+public:
+    enum Chamber {
+        TOPLEFT, TOPRIGHT, MIDDLE, BOTTOMLEFT, BOTTOMRIGHT
+    };
+
+protected:
+    static const int HEIGHT = 25;
+    static const int WIDTH = 79;
+    string layout = "|-----------------------------------------------------------------------------||                                                                             || |--------------------------|        |-----------------------|               || |..........................|        |.......................|               || |..........................+########+.......................|-------|       || |..........................|   #    |...............................|--|    || |..........................|   #    |..................................|--| || |----------+---------------|   #    |----+----------------|...............| ||            #                 #############                |...............| ||            #                 #     |-----+------|         |...............| ||            #                 #     |............|         |...............| ||            ###################     |............|   ######+...............| ||            #                 #     |............|   #     |...............| ||            #                 #     |-----+------|   #     |--------+------| ||  |---------+-----------|     #           #          #              #        ||  |.....................|     #           #          #         |----+------| ||  |.....................|     ########################         |...........| ||  |.....................|     #           #                    |...........| ||  |.....................|     #    |------+--------------------|...........| ||  |.....................|     #    |.......................................| ||  |.....................+##########+.......................................| ||  |.....................|          |.......................................| ||  |---------------------|          |---------------------------------------| ||                                                                             ||-----------------------------------------------------------------------------|";
+
+    // CHAMBER INFO:
+    vector<Chamber> chambers = {TOPLEFT, TOPRIGHT, MIDDLE, BOTTOMLEFT, BOTTOMRIGHT};
+
+    // chamber coordinate bounds (by row): (top left tile is (0, 0))
+    
+    // chamber topleft (1): 
+    // (3, 3) -> (28, 3)
+    // (3, 4) -> (28, 4)
+    // (3, 5) -> (28, 5)
+    // (3, 6) -> (28, 6)
+    vector<vector<int>> tlBounds = {
+        {3, 3, 28}, {3, 4, 28}, {3, 5, 28}, {3, 6, 28}
+    };
+
+    // chamber topright:
+    // (39, 3) -> (61, 3)
+    // (39, 4) -> (61, 4)
+    // (39, 5) -> (69, 5)
+    // (39, 6) -> (72, 6)
+    // (61, 7) -> (75, 7)
+    // (61, 8) -> (75, 8)
+    // (61, 9) -> (75, 9)
+    // (61, 10) -> (75, 10)
+    // (61, 11) -> (75, 11)
+    // (61, 12) -> (75, 12)
+    vector<vector<int>> trBounds = {
+        {39, 3, 61}, {39, 4, 61}, {39, 5, 69}, {39, 6, 72},
+        {61, 7, 75}, {61, 8, 75}, {61, 9, 75}, {61, 10, 75},
+        {61, 11, 75}, {61, 12, 75}
+    };
+
+    // chamber middle:
+    // (38, 10) -> (49, 10)
+    // (38, 11) -> (49, 11)
+    // (38, 12) -> (49, 12)
+    vector<vector<int>> mBounds = {
+        {38, 10, 49}, {38, 11, 49}, {38, 12, 49}
+    };
+
+    // chamber bottomleft:
+    // (4, 15) -> (24, 15)
+    // (4, 16) -> (24, 16)
+    // (4, 17) -> (24, 17)
+    // (4, 18) -> (24, 18)
+    // (4, 19) -> (24, 19)
+    // (4, 20) -> (24, 20)
+    // (4, 21) -> (24, 21)
+    vector<vector<int>> blBounds = {
+        {4, 15, 24}, {4, 16, 24}, {4, 17, 24}, {4, 18, 24},
+        {4, 19, 24}, {4, 20, 24}, {4, 21, 24}
+    };
+
+    // chamber bottomright:
+    // (65, 16) -> (75, 16)
+    // (65, 17) -> (75, 17)
+    // (65, 18) -> (75, 18)
+    // (37, 19) -> (75, 19)
+    // (37, 20) -> (75, 20)
+    // (37, 21) -> (75, 21)
+    vector<vector<int>> brBounds = {
+        {65, 16, 75}, {65, 17, 75}, {65, 18, 75}, {37, 19, 75},
+        {37, 20, 75}, {37, 21, 75}
+    };
+
+    vector<vector<shared_ptr<Tile>>> tiles;
+
+
+public:
+
+    Floor() {
+
+        int index = 0;
+        for (int r = 0; r < HEIGHT; ++r) {
+            vector<shared_ptr<Tile>> row;
+            for (int c = 0; c < WIDTH; ++c) {
+                char chr = layout[index++];
+                Tile::Type type;
+
+                switch (chr) {
+                    case ' ': type = Tile::WS; break;
+                    case '|': type = Tile::VWALL; break;
+                    case '-': type = Tile::HWALL; break;
+                    case '#': type = Tile::PASSAGE; break;
+                    case '+': type = Tile::DOOR; break;
+                    case '.': type = Tile::EMPTY; break;
+                    default: type = Tile::WS; 
+                }
+                
+                row.push_back(make_shared<Tile>(type, c, r));
+            }
+
+            tiles.push_back(row);
+        }
+    }
+
+    vector<vector<shared_ptr<Tile>>> getTiles() {
+        return tiles;
+    }
+
+    shared_ptr<Tile> getTile(int x, int y) {
+        return tiles.at(y).at(x);
+    }
+
+    vector<Chamber> getChambers() {
+        return chambers;
+    }
+
+    vector<vector<int>> getChamberBounds(Chamber chamber) {
+        switch (chamber) {
+            case TOPLEFT: return tlBounds; break;
+            case TOPRIGHT: return trBounds; break;
+            case MIDDLE: return mBounds; break;
+            case BOTTOMLEFT: return blBounds; break;
+            case BOTTOMRIGHT: return brBounds; break;
+            default: return mBounds; break;
+        }
+    }
+};
+
+#endif#ifndef GAME_H
+#define GAME_H
+
+#include "subject.h"
+#include "floor.h"
+#include "tile.h"
+#include "playerChar.h"
+#include "enemy.h"
+#include "enemyFactory.h"
+#include <sstream>
+#include <utility>
+#include <vector>
+#include <memory>
+#include <random>
+
+class Game : public Subject {
+    // a floors coords runs from (0, 0) to (24, 78)
+    static const int MAXFLOORS = 5;
+    vector<shared_ptr<Floor>> floors;
+    shared_ptr<PlayerChar> player;
+
+    unsigned seed; // randomizer
+    int currentFloor;
+    int goldScore;
+
+    string commandLine;
+
+public:
+    Game(shared_ptr<PlayerChar> player, unsigned seed) 
+    : player{player}, seed{seed}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
+        
+        for(int i = 0; i < MAXFLOORS; ++i) {
+            floors.push_back(make_shared<Floor>());
+        }
+    }
+
+    // HELPER FUNCTION TO RANDOMIZE SPAWNS
+    vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds, unsigned seed) {
+        default_random_engine rng{seed};
+        shuffle(chamberBounds.begin(), chamberBounds.end(), rng);
+        vector<int> spawnRow = chamberBounds.at(0);
+
+        vector<int> xCoords;
+        for (int i = spawnRow.at(0); i <= spawnRow.at(2); ++i) {
+            xCoords.push_back(i);
+        }
+
+        shuffle(xCoords.begin(), xCoords.end(), rng);
+        vector<int> resultCoords;
+        resultCoords.push_back(xCoords.at(0));
+        resultCoords.push_back(spawnRow.at(1));
+
+        return resultCoords;
+    }
+
+    void initFloor() {
+        shared_ptr<Floor> curFloor = getFloor(currentFloor);
+
+        // RANDOMIZING PLAYER/STAIRS SPAWN
+        vector<Floor::Chamber> chambers = curFloor->getChambers();
+        default_random_engine rng{seed};
+        shuffle(chambers.begin(), chambers.end(), rng); // randomize chamber
+        Floor::Chamber playerSpawn = chambers.at(0);
+        Floor::Chamber stairsSpawn = chambers.at(1);
+
+        // get random spawn for player
+        vector<vector<int>> playerChamberBounds = curFloor->getChamberBounds(playerSpawn);
+        vector<int> playerCoords = getRandomSpawn(playerChamberBounds, seed);
+        int playerX = playerCoords.at(0);
+        int playerY = playerCoords.at(1);
+
+        // get random spawn for stairs
+        vector<vector<int>> stairsChamberBounds = curFloor->getChamberBounds(stairsSpawn);
+        vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds, seed);
+        int stairsX = stairsCoords.at(0);
+        int stairsY = stairsCoords.at(1);
+
+        // SET PLAYER SPAWN
+        curFloor->getTile(playerX, playerY)->setType(Tile::PLAYER); 
+        player->setPos(playerX, playerY);
+
+        // SET STAIRS SPAWN
+        curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
+        curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
+
+        // SPAWN POTIONS
+
+        // SPAWN GOLD
+
+        // SPAWN ENEMIES
+
+	    // testing an enemy spawn
+	    int x = 27;
+	    int y = 6;
+
+        // no randomness yet, only generates werewolf
+	    shared_ptr<Enemy> enemyTest = EnemyFactory::createEnemy();
+	    curFloor->getTile(x, y)->setType(Tile::ENEMY); // sets enemyTest spawn
+        curFloor->getTile(x, y)->setEnemy(enemyTest);
+	    enemyTest->setPos(x, y);
+	
+    }
+
+    int getCurrentFloor() {
+        return currentFloor;
+    }
+
+    shared_ptr<Floor> getFloor(int floorNum) {
+        return floors.at(floorNum - 1);
+    }
+
+    shared_ptr<PlayerChar> getPlayer() {
+        return player;
+    }
+
+    int getGoldScore() {
+        return goldScore;
+    }
+
+    void displayGame() {
+        notifyObservers();
+    }
+
+    void setCommandLine(string &command) {
+        commandLine = command;
+    }
+
+    string getCommandLine() {
+        return commandLine;
+    }
+
+    // game logic
+
+    void move(string dir) {
+        int curX = player->getX();
+        int curY = player->getY();
+        int tempX = player->getX();
+        int tempY = player->getY();
+        string direction;
+
+        if (dir == "no") { 
+            tempY -= 1;
+            direction = "North";
+        } else if (dir == "so") {
+            tempY += 1;
+            direction = "South";
+        } else if (dir == "ea") {
+            tempX += 1;
+            direction = "East";
+        } else if (dir == "we") {
+            tempX -= 1;
+            direction = "West";
+        } else if (dir == "ne") {
+            tempX += 1;
+            tempY -= 1;
+            direction = "Northeast";
+        } else if (dir == "nw") {
+            tempX -= 1;
+            tempY -= 1;
+            direction = "Northwest";
+        } else if (dir == "se") {
+            tempX += 1;
+            tempY += 1;
+            direction = "Southeast";
+        } else if (dir == "sw") {
+            tempX -= 1;
+            tempY += 1;
+            direction = "Southwest";
+        } 
+
+        string actionResult;
+        shared_ptr<Floor> curFloor = getFloor(currentFloor);
+        
+        // check nextTile validity
+        shared_ptr<Tile> nextTile = curFloor->getTile(tempX, tempY);
+        string nextTileType = nextTile->getType();
+
+        // if empty
+        if (nextTileType == "empty") {
+            nextTile->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+            curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+            
+            actionResult = "PC moves " + direction;
+        
+        // if passage
+        } else if (nextTileType == "passage") {
+            nextTile->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+            curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
+            
+            actionResult = "PC crawls " + direction;
+
+        // if door
+        } else if (nextTileType == "door") {
+            if (player->isInPassage()) {
+                // find empty tile
+                if (curFloor->getTile(tempX + 1, tempY)->getType() == "empty") {
+                    tempX += 1;
+                } else if (curFloor->getTile(tempX - 1, tempY)->getType() == "empty") {
+                    tempX -= 1;
+                } else if (curFloor->getTile(tempX, tempY + 1)->getType() == "empty") {
+                    tempY += 1;
+                } else {
+                    tempY -= 1;
+                }
+
+                curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
+                player->setInPassage(false);
+                actionResult = "PC crawled out of the passage";
+
+            } else {
+                // find passage tile
+                if (curFloor->getTile(tempX + 1, tempY)->getType() == "passage") {
+                    tempX += 1;
+                } else if (curFloor->getTile(tempX - 1, tempY)->getType() == "passage") {
+                    tempX -= 1;
+                } else if (curFloor->getTile(tempX, tempY + 1)->getType() == "passage") {
+                    tempY += 1;
+                } else {
+                    tempY -= 1;
+                }
+
+                curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+                player->setInPassage(true);
+                actionResult = "PC entered a passage";
+            }
+
+            curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+            
+        } else {
+            actionResult = "You are trying to move out of bounds, try again.";
+        } // more else ifs depending on what the tile is
+
+        setCommandLine(actionResult);
+    }
+
+    void enemyMove(shared_ptr<Enemy> enemy) {
+	    if (!(enemy->getMoved())) {
+	        int curX = enemy->getX();
+            int curY = enemy->getY();
+
+	        shared_ptr<Floor> curFloor = getFloor(currentFloor);
+	        vector<pair<int, int>> validMoves;
+	        bool attack = false;
+	        string actionResult;
+
+	        // get enemy's potential moves, stop if player is found
+            // unless enemy is a merchant/dragon and is not hostile
+	        for (int i = curX-1; i <= curX+1; i++) {
+            	for (int j = curY-1; j <= curY+1; j++) {
+	    	        if (i != curX || j != curY) {
+		    	        if (curFloor->getTile(i, j)->getType() == "empty") {
+			                validMoves.emplace_back(make_pair(i,j));
+		   	            } else if (enemy->isHostile()) {
+                            if (curFloor->getTile(i, j)->getType() == "player") {
+			                    attack = true;
+			                    break;
+                            }
+		    	        }
+	    	        }
+            	}
+    	    }
+
+	        if (attack) {
+		        // for now they always hit, but
+                // enemy attacks have 50% accuracy
+                // let's say 0-49 is miss, 50-99 is hit
+                int rand = 50;
+                if (rand > 49) {
+                    // The extra (100 + player DEF - 1) is there so it rounds up
+                    int damage = ((100 + 100 + getPlayer()->getDEF() - 1)/(100 + getPlayer()->getDEF())) * enemy->getATK();
+                    // if (BarrierSuit) {
+                    // damage = ceil(damage / 2) 
+                    // }
+                    getPlayer()->setHP(getPlayer()->getHP() - damage);
+                    ostringstream oss;
+                    oss << enemy->getSymbol() << " deals " << damage << " damage to PC.";
+                    actionResult += oss.str();
+                } else {
+		            actionResult += enemy->getSymbol();
+                    actionResult += " attacks PC but misses.";
+                }
+		        setCommandLine(actionResult);
+	        } else {
+	    	    // pick a direction and go in it
+	    	    // would be generated between 0 and
+	    	    // surroundings.size()
+	    	    int rand = 0;
+	    	    shared_ptr<Tile> nextTile = curFloor->getTile(validMoves[rand].first, validMoves[rand].second);
+	    	    nextTile->setType(Tile::ENEMY);
+		        nextTile->setEnemy(enemy);
+            	enemy->setPos(validMoves[rand].first, validMoves[rand].second);
+            	curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+	        }
+
+	        enemy->setMoved();
+	    }
+    }
+
+    void enemyRound() {
+	    shared_ptr<Floor> curFloor = getFloor(currentFloor);    
+    	for (int i = 0; i < 79; i++) {
+	        for (int j = 0; j < 25; j++) {
+	            if (curFloor->getTile(i,j)->getType() == "enemy") {
+		            enemyMove(curFloor->getTile(i,j)->getEnemy());
+		        }    
+	        }
+	    }
+
+	    for (int i = 0; i < 79; i++) {
+            for (int j = 0; j < 25; j++) {
+                if (curFloor->getTile(i,j)->getType() == "enemy") {	
+                    curFloor->getTile(i,j)->getEnemy()->resetMoved();
+                }
+            }
+        }
+    }
+};
+
+
+#endif
+#ifndef GAMEFACTORY_H
+#define GAMEFACTORY_H
+#include <string>
+#include <memory>
+
+#include "playerChar.h"
+
+class GameFactory {
+
+public:
+    // returns a race specific player, if race is invalid then returns nullptr
+    static std::shared_ptr<PlayerChar> createPlayer( const std::string &race );
+};
+
+#endif
+#ifndef GOBLIN_H
+#define GOBLIN_H
+#include <string>
+
+#include "enemy.h"
+
+class Goblin : public Enemy {
+
+public:
+    Goblin();
+
+};
+
+#endif#ifndef HUMAN_H
+#define HUMAN_H
+#include <string>
+
+#include "playerChar.h"
+
+class Human : public PlayerChar {
+
+public:
+    Human();
+    // void playerAbility() override;
+};
+
+#endif
+#ifndef MERCHANT_H
+#define MERCHANT_H
+#include <string>
+
+#include "enemy.h"
+
+class Merchant : public Enemy {
+    // controls whether all merchants attack the player
+    inline static bool hostile = false;
+
+  public:
+    Merchant();
+    
+    void makeHostile();
+    bool isHostile();
+};
+
+#endif#ifndef OBSERVER_H
+#define OBSERVER_H
+
+class Subject;
+
+class Observer {
+    public:
+        virtual void notify () = 0;
+        virtual ~Observer () {};
+};
+
+#endif
+#ifndef ORC_H
+#define ORC_H
+#include <string>
+
+#include "playerChar.h"
+
+class Orc : public PlayerChar {
+
+public:
+    Orc();
+    // void playerAbility() override;
+};
+
+#endif
+#ifndef PHOENIX_H
+#define PHOENIX_H
+#include <string>
+
+#include "enemy.h"
+
+class Phoenix : public Enemy {
+
+public:
+    Phoenix();
+
+};
+
+#endif#ifndef PLAYERCHAR_H
+#define PLAYERCHAR_H
+#include <string>
+
+class PlayerChar {
+
+protected:
+    std::string race;
+    int MAXHP;
+    int HP;
+    int ATK;
+    int DEF;
+
+    int x, y;
+    bool inPassage;
+
+public:
+    PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
+    virtual ~PlayerChar() = default;
+    // virtual void playerAbility() = 0;
+
+    int getHP();
+    int getATK();
+    int getDEF();
+    std::string getRace();
+
+    void setHP(int newHP);
+    void setPos(int newX, int newY);
+    int getX();
+    int getY();
+    bool isInPassage();
+    void setInPassage(bool inout);
+};
+
+#endif
+#ifndef SUBJECT_H
+#define SUBJECT_H
+
+#include <vector>
+#include <memory>
+#include "observer.h"
+using namespace std;
+
+class Observer;
+
+class Subject {
+    vector<shared_ptr<Observer>> observers;
+
+public:
+    void attach(shared_ptr<Observer> o);
+    void detach(shared_ptr<Observer> o);
+    void notifyObservers();
+    virtual ~Subject() = default;
+};
+
+#endif
+#ifndef TEXT_DISPLAY_H
+#define TEXT_DISPLAY_H
+
+#include <iostream>
+#include <memory>
+#include "observer.h"
+#include "game.h"
+using namespace std;
+
+class TextDisplay: public Observer {
+    shared_ptr<Game> subject;
+
+public:
+    TextDisplay(shared_ptr<Game> s);
+    ~TextDisplay();
+    void notify() override;
+};
+
+#endif
+#ifndef TILE_H
+#define TILE_H
+
+#include <string>
+#include "enemy.h"
+
+class Tile {
+
+public:
+    enum Type {
+        WS, VWALL, HWALL, PASSAGE, DOOR, STAIRS, EMPTY, PLAYER, ENEMY, ITEM
+    };
+
+protected:
+    // a tile can be any of:
+    // whitespace, vWall (Vertical), hWall (Horizontal), passage, door, stairs, empty or
+    // "thing": player, enemy or item.
+
+    Type type;
+    shared_ptr<Enemy> enemy;
+    // shared_ptr<Item> Item;
+
+    int x, y;
+    bool stairsVisible = false;
+
+public:
+
+    // need args for enemy, item ptr
+    Tile(Type type, int x, int y) : type{type}, x{x}, y{y} {};
+
+    string getType() {
+        switch (type) {
+            case WS: return "ws"; break;
+            case VWALL: return "vWall"; break;
+            case HWALL: return "hWall"; break;
+            case PASSAGE: return "passage"; break;
+            case DOOR: return "door"; break;
+            case STAIRS: return "stairs"; break;
+            case EMPTY: return "empty"; break;
+            case PLAYER: return "player"; break;
+            case ENEMY: return "enemy"; break;
+            case ITEM: return "item"; break;
+            default: return "?"; break;
+        }
+    }
+
+    char getChar() {
+        switch (type) {
+            case WS: return ' '; break;
+            case VWALL: return '|'; break;
+            case HWALL: return '-'; break;
+            case PASSAGE: return '#'; break;
+            case DOOR: return '+'; break;
+            case STAIRS: return (stairsVisible) ? '/' : '.'; break;
+            case EMPTY: return '.'; break;
+            case PLAYER: return '@'; break;
+            case ENEMY: return enemy->getSymbol(); break;
+            // case ITEM: return Item->getSymbol; break;
+            default: return '?'; break;
+        }
+    }
+
+    void setType(Type newType) {
+        type = newType;
+    }
+
+    void setEnemy(shared_ptr<Enemy> newEnemy) {
+	    enemy = newEnemy;
+    }
+
+    shared_ptr<Enemy> getEnemy() {
+        return enemy;
+    }
+
+    void setStairsVisible() {
+        stairsVisible = true;
+    }
+
+};
+
+#endif
+#ifndef TROLL_H
+#define TROLL_H
+#include <string>
+
+#include "enemy.h"
+
+class Troll : public Enemy {
+
+public:
+    Troll();
+
+};
+
+#endif#ifndef VAMPIRE_H
+#define VAMPIRE_H
+#include <string>
+
+#include "enemy.h"
+
+class Vampire : public Enemy {
+
+public:
+    Vampire();
+
+};
+
+#endif#ifndef WEREWOLF_H
+#define WEREWOLF_H
+#include <string>
+
+#include "enemy.h"
+
+class Werewolf : public Enemy {
+
+public:
+    Werewolf();
+
+};
+
+#endif#include "dragon.h"
+
+Dragon::Dragon() : Enemy("Dragon", 'D', 150, 150, 20, 20) {}
+
+void Dragon::makeHostile() {
+    hostile = true;
+}
+
+bool Dragon::isHostile() {
+    return hostile;
+}
+#include "dwarf.h"
+
+Dwarf::Dwarf() : PlayerChar("Dwarf", 100, 100, 20, 30, 1) {}
+
+// void Dwarf::playerAbility() { /*implement */ }
+#include "elf.h"
+
+Elf::Elf() : PlayerChar("Elf", 140, 140, 30, 10, 1) {}
+
+// void Elf::playerAbility() { /*implement */ }
+#include "enemy.h"
+#include <string>
+
+using namespace std;
+
+Enemy::Enemy( string name, char symbol, int maxhp, int hp, int atk, int def )
+: name{name}, symbol{symbol}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0}, hasMoved{false} {}
+
+int Enemy::getHP() { return HP; }
+
+int Enemy::getATK() { return ATK; }
+
+int Enemy::getDEF() { return DEF; }
+
+string Enemy::getName() { return name; }
+
+char Enemy::getSymbol() { return symbol; }
+
+bool Enemy::getMoved() { return hasMoved; }
+
+bool Enemy::isHostile() { return true; }
+
+void Enemy::setPos(int newX, int newY) {
+    x = newX;
+    y = newY;
+}
+
+int Enemy::getX() {
+    return x;
+}
+
+int Enemy::getY() {
+    return y;
+}
+
+void Enemy::setMoved() {
+    hasMoved = true; 
+}
+
+void Enemy::resetMoved() {
+    hasMoved = false;
+}
+#include "enemyFactory.h"
+#include <string>
+#include <memory>
+
+#include "vampire.h"
+#include "werewolf.h"
+#include "goblin.h"
+#include "troll.h"
+#include "merchant.h"
+#include "phoenix.h"
+#include "dragon.h"
+
+using namespace std;
+
+shared_ptr<Enemy> EnemyFactory::createEnemy() {
+    // right now this only generates werewolves
+    // generate # between 1-18 here
+    int rand = 1; 
+
+    if (rand <= 4) { return make_shared<Werewolf>(); }
+    else if (rand > 4 && rand < 8) { return make_shared<Vampire>(); }
+    else if (rand > 7 && rand < 13) { return make_shared<Goblin>(); }
+    else if (rand > 12 && rand < 15) { return make_shared<Troll>(); }
+    else if (rand > 14 && rand < 17) { return make_shared<Phoenix>(); }
+    else { return make_shared<Merchant>(); }
+
+}
+
+shared_ptr<Enemy> EnemyFactory::createDragon() {
+    // Gets called when dragon hoard or Barrier Suit is spawned
+    return make_shared<Dragon>();
+}
+#include "gameFactory.h"
+#include <string>
+#include <memory>
+
+#include "human.h"
+#include "dwarf.h"
+#include "elf.h"
+#include "orc.h"
+
+using namespace std;
+
+shared_ptr<PlayerChar> GameFactory::createPlayer( const string &race ) {
+    if (race == "h") { return make_shared<Human>(); }
+    else if (race == "d") { return make_shared<Dwarf>(); }
+    else if (race == "e") { return make_shared<Elf>(); }
+    else if (race == "o") { return make_shared<Orc>(); }
+    else { return nullptr; }
+}
+#include "goblin.h"
+
+Goblin::Goblin() : Enemy("Goblin", 'N', 70, 70, 5, 10) {}#include "human.h"
+
+Human::Human() : PlayerChar("Human", 140, 140, 20, 20, 1) {}
+
+// void Human::playerAbility() {}
+#include <iostream>
+#include <string>
+
+#include "playerChar.h"
+#include "game.h"
+#include "textDisplay.h"
+#include "gameFactory.h"
+
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+using namespace std;
+
+int main() {      // will need cmd line args at some point
+
+    while (true) {
+        cout << "Choose your character's race from the following:" << endl;
+        cout << "Human (h), Dwarf (d), Elf (e), Orc (o), or Quit (q)." << endl;
+        cout << "My choice:" << endl;
+
+        string race;
+        cin >> race;
+
+        if (race == "q") { break; }
+        shared_ptr<PlayerChar> player = GameFactory::createPlayer(race);
+        
+        if (!player) {
+            cout << "Unidentified race, please try again." << endl;
+            continue;
+        }
+
+        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+
+        shared_ptr<Game> mainGame = make_shared<Game>(player, seed);
+        shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
+        mainGame->initFloor();
+        mainGame->displayGame();
+
+        string command;
+        while (cin >> command) { // GAME SIM
+            
+            // game commands
+
+            // MOVE
+            if (command == "no" || command == "so" || command == "ea" || command == "we"
+                || command == "ne" || command == "nw" || command == "se" || command == "sw") {
+                
+                mainGame->move(command);
+
+            // USE POTION IN DIRECTION
+            } else if (command == "u") {
+                cin >> command;
+
+                // implement use potion method
+
+            // ATTACK ENEMY IN DIRECTION
+            } else if (command == "a") {
+                cin >> command;
+
+                // implement attack method
+
+            // QUIT/RESTART
+            } else if (command == "q" || command == "r") {
+                break;
+
+            // INVALID COMMAND
+            } else {
+                cout << "Invalid option, try again." << endl;
+                continue;
+            }
+
+            mainGame->enemyRound();	
+            mainGame->displayGame();
+            
+            // end game clauses
+            if (mainGame->getCurrentFloor() > 5) {
+                cout <<"Congratulations, you have beaten the game!" << endl;
+                break;
+            }
+
+            if (player->getHP() <= 0) {
+                cout << "You have been slain." << endl;
+                break;
+            }
+	
+        }
+
+        // final score generation
+        int finalScore = (player->getRace() == "Human") ? (mainGame->getGoldScore() * 1.5) : mainGame->getGoldScore();
+        cout << "Final Score: " << finalScore << endl;
+
+        // ending bit
+        if (command == "q") {
+            break;
+        } else if (command == "r") {
+            continue;
+        } else {
+            cout << "Would you like to restart? Yes/No:" << endl;
+            cin >> command;
+            if (command == "Yes") { continue; }
+            else { break; }
+        }
+    }
+
+    return 0;
+}
+#include "merchant.h"
+
+Merchant::Merchant() : Enemy("Merchant", 'M', 30, 30, 70, 5) {}
+
+void Merchant::makeHostile() {
+    Merchant::hostile = true;
+}
+
+bool Merchant::isHostile() {
+    return Merchant::hostile;
+}
+#include "orc.h"
+
+Orc::Orc() : PlayerChar("Orc", 180, 180, 30, 25, 1) {}
+
+// void Orc::playerAbility() { /*implement */ }
+#include "phoenix.h"
+
+Phoenix::Phoenix() : Enemy("Phoenix", 'X', 50, 50, 35, 20) {}
+#include "playerChar.h"
+#include <string>
+
+using namespace std;
+
+PlayerChar::PlayerChar( string race, int maxhp, int hp, int atk, int def, int floor ) 
+: race{race}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0}, inPassage{false} {}
+
+int PlayerChar::getHP() { return HP; }
+
+int PlayerChar::getATK() { return ATK; }
+
+int PlayerChar::getDEF() { return DEF; }
+
+string PlayerChar::getRace() { return race; }
+
+void PlayerChar::setHP(int newHP) {
+    HP = newHP;
+}
+
+void PlayerChar::setPos(int newX, int newY) {
+    x = newX;
+    y = newY;
+}
+
+int PlayerChar::getX() {
+    return x;
+}
+
+int PlayerChar::getY() {
+    return y;
+}
+
+bool PlayerChar::isInPassage() {
+    return inPassage;
+}
+
+void PlayerChar::setInPassage(bool inout) {
+    inPassage = inout;
+}
+#include "subject.h"
+#include <memory>
+using namespace std;
+
+void Subject::attach(shared_ptr<Observer> o) {
+    observers.push_back(o);
+}
+
+void Subject::detach(shared_ptr<Observer> o){
+    for (auto it = observers.begin(); it != observers.end(); ++it) {
+        if (*it == o) {
+            observers.erase(it);
+            return;
+        }
+    }
+}
+
+void Subject::notifyObservers() {
+  for (auto ob : observers) ob->notify();
+}
+#include "textDisplay.h"
+#include <vector>
+using namespace std;
+
+struct ptrDeleter {
+    void operator()(void const *) const {
+    }
+};
+
+TextDisplay::TextDisplay(shared_ptr<Game> s) : subject(s) {
+    shared_ptr<Observer> o (this, ptrDeleter());
+    subject->attach(o);
+}
+
+void TextDisplay::notify() {
+
+    int floorNum = subject->getCurrentFloor();
+    shared_ptr<Floor> currentFloor = subject->getFloor(floorNum);
+    vector<vector<shared_ptr<Tile>>> tiles = currentFloor->getTiles();
+
+    for(vector<shared_ptr<Tile>> row : tiles) {
+        for(shared_ptr<Tile> tile : row) {
+            cout << tile->getChar();
+        }
+        
+        cout << endl;
+    } 
+
+    shared_ptr<PlayerChar> player = subject->getPlayer();
+
+    cout << "Race: " << player->getRace() << " Gold: " << subject->getGoldScore() << "                                                  Floor " << floorNum << endl;
+    cout << "HP: " << player->getHP() << endl;
+    cout << "Atk: " << player->getATK() << endl;
+    cout << "Def: " << player->getDEF() << endl;
+    cout << "Action: " << subject->getCommandLine() << endl; 
+}
+
+TextDisplay::~TextDisplay() {
+    shared_ptr<Observer> o (this, ptrDeleter());
+    subject->detach(o);
+}
+#include "troll.h"
+
+Troll::Troll() : Enemy("Troll", 'T', 120, 120, 30, 5) {}#include "vampire.h"
+
+Vampire::Vampire() : Enemy("Vampire", 'V', 50, 50, 25, 25) {}
+#include "werewolf.h"
+
+Werewolf::Werewolf() : Enemy("Werewolf", 'W', 120, 120, 30, 5) {}

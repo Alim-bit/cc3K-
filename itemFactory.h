@@ -1,8 +1,8 @@
 #ifndef ITEMFACTORY_H
 #define ITEMFACTORY_H
 
-#include <string>
 #include <memory>
+#include <string>
 #include "item.h"
 
 class Cell; // forward
@@ -10,7 +10,7 @@ class Floor; // forward
 
 class ItemFactory {
 public:
-    static std::unique_ptr<Item> create(const std::string &type, Cell* pos, Floor* fl);
+    static std::shared_ptr<Item> createItem(std::string name);
 };
 
 #endif // ITEMFACTORY_H

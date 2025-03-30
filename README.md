@@ -23,12 +23,7 @@
 - Proper generation order (IN PROGRESS)
 
 ### **Enemy Class**
-- Enemy generation
-- Enemy random movement ("Note that enemies should be moved in a line-by-line fashion")
-- Hoard spawns
 - Merchant/Dragon specific behavior
-- Player vs Enemy battle mechanics
-- Enemy character display in `Tile` class
 
 ### **Items Class**
 - Potion generation

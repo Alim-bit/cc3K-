@@ -4,8 +4,9 @@
 #include "item.h"
 
 class BAPotion : public Item {
+
 public:
-    BAPotion(Cell* pos, Floor* fl);
+    BAPotion();
     virtual void pickUp() override;
 };
 

@@ -5,7 +5,7 @@
 
 class Compass : public Item {
 public:
-    Compass(Cell* pos, Floor* fl);
+    Compass();
     virtual void pickUp() override;
 };
 

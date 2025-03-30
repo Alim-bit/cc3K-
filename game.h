@@ -7,6 +7,8 @@
 #include "playerChar.h"
 #include "enemy.h"
 #include "enemyFactory.h"
+#include "item.h"
+#include "itemFactory.h"
 
 #include <sstream>
 #include <utility>
@@ -87,36 +89,46 @@ public:
         curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
         // SPAWN POTIONS
-        /*
         int numPotions = 10;
-        vector<string> potionTypes = {"RH", "BA", "BD", "PH", "WA", "WD"};
+        uniform_int_distribution<int> potionProbability(1,6);
         for (int i = 0; i < numPotions; ++i) {
-            // Create a vector of chamber indices and shuffle it
-            vector<int> chamberIndices(chambers.size());
-            for (size_t j = 0; j < chambers.size(); ++j) {
-                chamberIndices[j] = j;
+            int randPotion = potionProbability(rng);
+            shared_ptr<Item> spawnedPotion;
+            if (randPotion == 1) {
+                spawnedPotion = ItemFactory::createItem("RH");
+            } else if (randPotion == 2) {
+                spawnedPotion = ItemFactory::createItem("BA");
+            } else if (randPotion == 3) {
+                spawnedPotion = ItemFactory::createItem("BD");
+            } else if (randPotion == 4) {
+                spawnedPotion = ItemFactory::createItem("PH");
+            } else if (randPotion == 5) {
+                spawnedPotion = ItemFactory::createItem("WA");
+            } else {
+                spawnedPotion = ItemFactory::createItem("WD");
             }
-            shuffle(chamberIndices.begin(), chamberIndices.end(), rng);
-            int chosenIndex = chamberIndices[0];
-            Floor::Chamber chosenChamber = chambers.at(chosenIndex);
             
-            vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
-            vector<int> coords = getRandomSpawn(bounds);
-            int x = coords.at(0);
-            int y = coords.at(1);
-            shared_ptr<Tile> tile = curFloor->getTile(x, y);
-            if (tile->getType() == "empty") {
-                // Shuffle a copy of the potion types and pick the first one
-                vector<string> tempPotionTypes = potionTypes;
-                shuffle(tempPotionTypes.begin(), tempPotionTypes.end(), rng);
-                string pType = tempPotionTypes[0];
-                // Create potion using the ItemFactory (returns a unique_ptr<Item>)
-                unique_ptr<Item> potion = ItemFactory::create(pType, tile->getCell(), curFloor.get());
-                tile->setType("potion");
-                curFloor->addItem(move(potion));
+            shuffle(chambers.begin(), chambers.end(), rng);
+            Floor::Chamber potionSpawn = chambers.at(0);
+            vector<vector<int>> potionChamberBounds = curFloor->getChamberBounds(potionSpawn);
+
+            // generates coords for the potion until it finds one that isn't on top of something else
+            vector<int> potionCoords;
+            while (true) {
+                vector<int> tempCoords = getRandomSpawn(potionChamberBounds);
+                if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
+                    potionCoords = tempCoords;
+                    break;
+                }
             }
+            int potionX = potionCoords.at(0);
+            int potionY = potionCoords.at(1);
+
+            curFloor->getTile(potionX, potionY)->setType(Tile::ITEM);
+            spawnedPotion->setPos(potionX, potionY);
+            curFloor->getTile(potionX, potionY)->setItem(spawnedPotion);
+
         }
-        */
 
 
         // SPAWN GOLD 
@@ -158,11 +170,14 @@ public:
             }
         }
         */
+
         // SPAWN ENEMIES
         // With items, will be i < 20 - number of dragon hoards, since
         // dragons are spawned separately (and there are 20 enemies per floor)
+        int numDragonHoards = 0;
+	int numEnemies = 20 - numDragonHoards;
         uniform_int_distribution<int> enemyProbability(1,18);
-         for (int i = 0; i < 20; i++) {
+         for (int i = 0; i < numEnemies; i++) {
             shared_ptr<Enemy> spawnedEnemy = EnemyFactory::createEnemy(enemyProbability(rng));
 
             shuffle(chambers.begin(), chambers.end(), rng);

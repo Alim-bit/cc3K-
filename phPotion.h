@@ -5,7 +5,7 @@
 
 class PHPotion : public Item {
 public:
-    PHPotion(Cell* pos, Floor* fl);
+    PHPotion();
     virtual void pickUp() override;
 };
 

@@ -5,7 +5,7 @@
 
 class SmallHoardGold : public Item {
 public:
-    SmallHoardGold(Cell* pos, Floor* fl);
+    SmallHoardGold();
     virtual void pickUp() override;
 };
 

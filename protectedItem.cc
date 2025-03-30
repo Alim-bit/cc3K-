@@ -3,7 +3,7 @@
 #include <iostream>
 
 ProtectedItem::ProtectedItem(std::unique_ptr<Item> itm, std::shared_ptr<Enemy> prot)
-    : Item(nullptr, nullptr, itm->getValue(), itm->getName()),
+    : Item(itm->getName(), itm->getSymbol(), itm->getValue()),
       item(std::move(itm)),
       protector(prot) {}
 

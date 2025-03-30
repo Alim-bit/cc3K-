@@ -5,7 +5,6 @@
 #include "phPotion.h"
 #include "waPotion.h"
 #include "wdPotion.h"
-#include "smallGold.h"
 #include "normalGold.h"
 #include "smallHoardGold.h"
 #include "merchantHoardGold.h"
@@ -15,19 +14,18 @@
 #include <stdexcept>
 #include <memory>
 
-std::unique_ptr<Item> ItemFactory::create(const std::string &type, Cell* pos, Floor* fl) {
-    if (type == "RH") return std::make_unique<RHPotion>(pos, fl);
-    else if (type == "BA") return std::make_unique<BAPotion>(pos, fl);
-    else if (type == "BD") return std::make_unique<BDPotion>(pos, fl);
-    else if (type == "PH") return std::make_unique<PHPotion>(pos, fl);
-    else if (type == "WA") return std::make_unique<WAPotion>(pos, fl);
-    else if (type == "WD") return std::make_unique<WDPotion>(pos, fl);
-    else if (type == "SmallGold") return std::make_unique<SmallGold>(pos, fl);
-    else if (type == "NormalGold") return std::make_unique<NormalGold>(pos, fl);
-    else if (type == "SmallHoardGold") return std::make_unique<SmallHoardGold>(pos, fl);
-    else if (type == "MerchantHoardGold") return std::make_unique<MerchantHoardGold>(pos, fl);
-    else if (type == "DragonHoardGold") return std::make_unique<DragonHoardGold>(pos, fl);
-    else if (type == "BarrierSuit") return std::make_unique<BarrierSuit>(pos, fl);
-    else if (type == "Compass") return std::make_unique<Compass>(pos, fl);
+std::shared_ptr<Item> ItemFactory::createItem(std::string name) {
+    if (name == "RH") return std::make_shared<RHPotion>();
+    else if (name == "BA") return std::make_shared<BAPotion>();
+    else if (name == "BD") return std::make_shared<BDPotion>();
+    else if (name == "PH") return std::make_shared<PHPotion>();
+    else if (name == "WA") return std::make_shared<WAPotion>();
+    else if (name == "WD") return std::make_shared<WDPotion>();
+    else if (name == "NG") return std::make_shared<NormalGold>();
+    else if (name == "SH") return std::make_shared<SmallHoardGold>();
+    else if (name == "MH") return std::make_shared<MerchantHoardGold>();
+    else if (name == "DH") return std::make_shared<DragonHoardGold>();
+    else if (name == "C") return std::make_shared<Compass>();
+    else if (name == "BS") return std::make_shared<BarrierSuit>();
     else throw std::invalid_argument("Unknown item type");
 }

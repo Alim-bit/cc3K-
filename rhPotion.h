@@ -5,7 +5,7 @@
 
 class RHPotion : public Item {
 public:
-    RHPotion(Cell* pos, Floor* fl);
+    RHPotion();
     virtual void pickUp() override;
 };
 

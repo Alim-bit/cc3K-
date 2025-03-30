@@ -5,7 +5,7 @@
 
 class BDPotion : public Item {
 public:
-    BDPotion(Cell* pos, Floor* fl);
+    BDPotion();
     virtual void pickUp() override;
 };
 

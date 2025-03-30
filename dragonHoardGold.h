@@ -5,7 +5,7 @@
 
 class DragonHoardGold : public Item {
 public:
-    DragonHoardGold(Cell* pos, Floor* fl);
+    DragonHoardGold();
     virtual void pickUp() override;
 };
 

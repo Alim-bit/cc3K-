@@ -5,7 +5,7 @@
 
 class WAPotion : public Item {
 public:
-    WAPotion(Cell* pos, Floor* fl);
+    WAPotion();
     virtual void pickUp() override;
 };
 

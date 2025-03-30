@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include "enemy.h"
+#include "item.h"
 
 class Tile {
 
@@ -19,7 +20,7 @@ protected:
 
     Type type;
     shared_ptr<Enemy> enemy;
-    // shared_ptr<Item> Item;
+    shared_ptr<Item> item;
 
     int x, y;
     bool stairsVisible = false;
@@ -56,7 +57,7 @@ public:
             case EMPTY: return '.'; break;
             case PLAYER: return '@'; break;
             case ENEMY: return enemy->getSymbol(); break;
-            // case ITEM: return Item->getSymbol; break;
+            case ITEM: return item->getSymbol(); break;
             default: return '?'; break;
         }
     }
@@ -71,6 +72,14 @@ public:
 
     shared_ptr<Enemy> getEnemy() {
         return enemy;
+    }
+
+    void setItem(shared_ptr<Item> newItem) {
+	    item = newItem;
+    }
+
+    shared_ptr<Item> getItem() {
+        return item;
     }
 
     void setStairsVisible() {

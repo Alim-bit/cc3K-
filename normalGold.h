@@ -5,7 +5,7 @@
 
 class NormalGold : public Item {
 public:
-    NormalGold(Cell* pos, Floor* fl);
+    NormalGold();
     virtual void pickUp() override;
 };
 

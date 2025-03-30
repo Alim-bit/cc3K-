@@ -1,8 +1,8 @@
 #include "normalGold.h"
 #include <iostream>
 
-NormalGold::NormalGold(Cell* pos, Floor* fl)
-    : Item(pos, fl, 6, 'G') {}
+NormalGold::NormalGold()
+    : Item("NG", 'G', 6) {}
 
 void NormalGold::pickUp() {
     std::cout << "Picked up a Normal Gold pile" << std::endl;

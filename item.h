@@ -4,23 +4,28 @@
 #include <iostream>
 #include <memory>
 
-// Forward declarations
-class Cell;
-class Floor;
 
 class Item {
 protected:
-    // Non-owning pointers to objects managed elsewhere
-    Cell* posn;
-    Floor* floor;
-    char name;
+    std::string name;
+    char symbol;
+
+    // This is for when floors are submitted
+    // as a command line argument
     int value;
+
+    int x, y;
+
 public:
-    Item(Cell* pos, Floor* fl, int val, char n);
+    Item(std::string name, char symbol, int value);
     virtual ~Item() = default;
     virtual void pickUp() = 0;
-    char getName() const;
+    std::string getName() const;
+    char getSymbol() const;
     int getValue() const;
+    int getX() const;
+    int getY() const;
+    void setPos(int newX, int newY);
 };
 
 #endif // ITEM_H

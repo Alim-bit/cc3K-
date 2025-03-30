@@ -5,7 +5,7 @@
 
 class BarrierSuit : public Item {
 public:
-    BarrierSuit(Cell* pos, Floor* fl);
+    BarrierSuit();
     virtual void pickUp() override;
 };
 

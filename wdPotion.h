@@ -5,7 +5,7 @@
 
 class WDPotion : public Item {
 public:
-    WDPotion(Cell* pos, Floor* fl);
+    WDPotion();
     virtual void pickUp() override;
 };
 

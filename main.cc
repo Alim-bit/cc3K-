@@ -5,7 +5,7 @@
 #include "game.h"
 #include "textDisplay.h"
 #include "gameFactory.h"
-
+#include <chrono>
 #include <algorithm>
 #include <random>
 
@@ -29,8 +29,12 @@ int main() {      // will need cmd line args at some point
             continue;
         }
 
-        shared_ptr<Game> mainGame = make_shared<Game>(player);
+        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+	    default_random_engine rng{seed};
+
+        shared_ptr<Game> mainGame = make_shared<Game>(player, rng);
         shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
+        
         mainGame->initFloor();
         mainGame->displayGame();
 

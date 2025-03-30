@@ -13,7 +13,6 @@
 #include <vector>
 #include <memory>
 #include <random>
-#include <chrono>
 
 class Game : public Subject {
     // a floors coords runs from (0, 0) to (24, 78)
@@ -23,20 +22,21 @@ class Game : public Subject {
 
     int currentFloor;
     int goldScore;
+    default_random_engine rng; // randomizer
 
     string commandLine;
 
 public:
-    Game(shared_ptr<PlayerChar> player) 
-    : player{player}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
-        
+    Game(shared_ptr<PlayerChar> player, default_random_engine rng) 
+    : player{player}, rng{rng}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
+
         for(int i = 0; i < MAXFLOORS; ++i) {
             floors.push_back(make_shared<Floor>());
         }
     }
 
     // HELPER FUNCTION TO RANDOMIZE SPAWNS
-    vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds, default_random_engine rng) {
+    vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds) {
         shuffle(chamberBounds.begin(), chamberBounds.end(), rng);
         vector<int> spawnRow = chamberBounds.at(0);
 
@@ -55,24 +55,22 @@ public:
 
     void initFloor() {
         shared_ptr<Floor> curFloor = getFloor(currentFloor);
-        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
         // RANDOMIZING PLAYER/STAIRS SPAWN
         vector<Floor::Chamber> chambers = curFloor->getChambers();
-        default_random_engine rng{seed};
         shuffle(chambers.begin(), chambers.end(), rng); // randomize chamber
         Floor::Chamber playerSpawn = chambers.at(0);
         Floor::Chamber stairsSpawn = chambers.at(1);
 
         // get random spawn for player
         vector<vector<int>> playerChamberBounds = curFloor->getChamberBounds(playerSpawn);
-        vector<int> playerCoords = getRandomSpawn(playerChamberBounds, rng);
+        vector<int> playerCoords = getRandomSpawn(playerChamberBounds);
         int playerX = playerCoords.at(0);
         int playerY = playerCoords.at(1);
 
         // get random spawn for stairs
         vector<vector<int>> stairsChamberBounds = curFloor->getChamberBounds(stairsSpawn);
-        vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds, rng);
+        vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds);
         int stairsX = stairsCoords.at(0);
         int stairsY = stairsCoords.at(1);
 
@@ -98,7 +96,8 @@ public:
             Floor::Chamber chosenChamber = chambers.at(chosenIndex);
             
             vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
-            vector<int> coords = getRandomSpawn(bounds, seed + i + 10);
+            // Sorry I changed this, why was it seed + i + 10 ?
+            vector<int> coords = getRandomSpawn(bounds);
             int x = coords.at(0);
             int y = coords.at(1);
             shared_ptr<Tile> tile = curFloor->getTile(x, y);
@@ -139,7 +138,7 @@ public:
             Floor::Chamber chosenChamber = chambers.at(chosenIndex);
             
             vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
-            vector<int> coords = getRandomSpawn(bounds, seed + i + 100);
+            vector<int> coords = getRandomSpawn(bounds);
             int x = coords.at(0);
             int y = coords.at(1);
             shared_ptr<Tile> tile = curFloor->getTile(x, y);
@@ -373,15 +372,17 @@ public:
                 }
 		        setCommandLine(actionResult);
 	        } else {
-	    	    // pick a direction and go in it
-	    	    // would be generated between 0 and
-	    	    // surroundings.size()
-	    	    int rand = 0;
-	    	    shared_ptr<Tile> nextTile = curFloor->getTile(validMoves[rand].first, validMoves[rand].second);
-	    	    nextTile->setType(Tile::ENEMY);
-		        nextTile->setEnemy(enemy);
-            	enemy->setPos(validMoves[rand].first, validMoves[rand].second);
-            	curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+	    	    // randomly selects a move out of validMoves
+		        if (validMoves.size() != 0) {
+			        shuffle(validMoves.begin(), validMoves.end(), rng);
+			        pair<int, int> newCoords = validMoves.at(0);
+			        shared_ptr<Tile> nextTile = curFloor->getTile(newCoords.first, newCoords.second);
+                   
+			        nextTile->setType(Tile::ENEMY);
+			        nextTile->setEnemy(enemy);
+			        enemy->setPos(newCoords.first, newCoords.second);
+			        curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+                }
 	        }
 
 	        enemy->setMoved();

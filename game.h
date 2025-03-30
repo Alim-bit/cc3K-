@@ -84,8 +84,74 @@ public:
         curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
         // SPAWN POTIONS
+        int numPotions = 10;
+        vector<string> potionTypes = {"RH", "BA", "BD", "PH", "WA", "WD"};
+        for (int i = 0; i < numPotions; ++i) {
+            // Create a vector of chamber indices and shuffle it
+            vector<int> chamberIndices(chambers.size());
+            for (size_t j = 0; j < chambers.size(); ++j) {
+                chamberIndices[j] = j;
+            }
+            shuffle(chamberIndices.begin(), chamberIndices.end(), rng);
+            int chosenIndex = chamberIndices[0];
+            Floor::Chamber chosenChamber = chambers.at(chosenIndex);
+            
+            vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
+            vector<int> coords = getRandomSpawn(bounds, seed + i + 10);
+            int x = coords.at(0);
+            int y = coords.at(1);
+            shared_ptr<Tile> tile = curFloor->getTile(x, y);
+            if (tile->getType() == "empty") {
+                // Shuffle a copy of the potion types and pick the first one
+                vector<string> tempPotionTypes = potionTypes;
+                shuffle(tempPotionTypes.begin(), tempPotionTypes.end(), rng);
+                string pType = tempPotionTypes[0];
+                // Create potion using the ItemFactory (returns a unique_ptr<Item>)
+                unique_ptr<Item> potion = ItemFactory::create(pType, tile->getCell(), curFloor.get());
+                tile->setType("potion");
+                curFloor->addItem(move(potion));
+            }
+        }
+        
+
 
         // SPAWN GOLD
+        int numGoldPiles = 10;
+    // Build a gold pool based on probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
+        vector<string> goldPool;
+        for (int i = 0; i < 5; ++i) {
+            goldPool.push_back("NormalGold");
+        }
+        for (int i = 0; i < 1; ++i) {
+            goldPool.push_back("DragonHoardGold");
+        }
+        for (int i = 0; i < 2; ++i) {
+            goldPool.push_back("SmallHoardGold");
+        }
+        for (int i = 0; i < numGoldPiles; ++i) {
+            vector<int> chamberIndices(chambers.size());
+            for (size_t j = 0; j < chambers.size(); ++j) {
+                chamberIndices[j] = j;
+            }
+            shuffle(chamberIndices.begin(), chamberIndices.end(), rng);
+            int chosenIndex = chamberIndices[0];
+            Floor::Chamber chosenChamber = chambers.at(chosenIndex);
+            
+            vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
+            vector<int> coords = getRandomSpawn(bounds, seed + i + 100);
+            int x = coords.at(0);
+            int y = coords.at(1);
+            shared_ptr<Tile> tile = curFloor->getTile(x, y);
+        if (tile->getType() == "empty") {
+            // Shuffle a copy of the gold pool and choose the first type
+            vector<string> tempGoldPool = goldPool;
+            shuffle(tempGoldPool.begin(), tempGoldPool.end(), rng);
+                string gType = tempGoldPool[0];
+                unique_ptr<Item> gold = ItemFactory::create(gType, tile->getCell(), curFloor.get());
+                tile->setType("gold");
+                curFloor->addItem(move(gold));
+            }
+        }
 
         // SPAWN ENEMIES
 

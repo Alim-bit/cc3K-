@@ -1,6 +1,6 @@
-# cc3K-
+# cc3K+
 
-## AVOID PUSHING .o and .d FILES!! ALSO ANY EXECUTABLE YOU MAKE!!
+## AVOID PUSHING .o and .d FILESgit push origin main ALSO ANY EXECUTABLE YOU MAKEgit push origin main
 
 ---
 
@@ -40,5 +40,3 @@
 - Item character display in `Tile` class
 - Treasure generation (implement enemy behavior of Dragons/Merchants)
 - Implement major items
-
----

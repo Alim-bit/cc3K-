@@ -117,7 +117,7 @@ public:
 
         // SPAWN GOLD
         int numGoldPiles = 10;
-    // Build a gold pool based on probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
+        // Build a gold pool based on probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
         vector<string> goldPool;
         for (int i = 0; i < 5; ++i) {
             goldPool.push_back("NormalGold");

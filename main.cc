@@ -71,7 +71,7 @@ int main() {      // will need cmd line args at some point
                 continue;
             }
 
-            // mainGame->enemyRound();	
+            mainGame->enemyRound();	
             mainGame->displayGame();
             
             // end game clauses

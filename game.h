@@ -20,9 +20,9 @@ class Game : public Subject {
     vector<shared_ptr<Floor>> floors;
     shared_ptr<PlayerChar> player;
 
+    default_random_engine rng; // randomizer
     int currentFloor;
     int goldScore;
-    default_random_engine rng; // randomizer
 
     string commandLine;
 
@@ -83,6 +83,7 @@ public:
         curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
         // SPAWN POTIONS
+        /*
         int numPotions = 10;
         vector<string> potionTypes = {"RH", "BA", "BD", "PH", "WA", "WD"};
         for (int i = 0; i < numPotions; ++i) {
@@ -96,7 +97,6 @@ public:
             Floor::Chamber chosenChamber = chambers.at(chosenIndex);
             
             vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
-            // Sorry I changed this, why was it seed + i + 10 ?
             vector<int> coords = getRandomSpawn(bounds);
             int x = coords.at(0);
             int y = coords.at(1);
@@ -112,10 +112,11 @@ public:
                 curFloor->addItem(move(potion));
             }
         }
-        
+        */
 
 
-        // SPAWN GOLD
+        // SPAWN GOLD 
+        /*
         int numGoldPiles = 10;
         // Build a gold pool based on probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
         vector<string> goldPool;
@@ -152,7 +153,7 @@ public:
                 curFloor->addItem(move(gold));
             }
         }
-
+        */
         // SPAWN ENEMIES
         // With items, will be i < 20 - number of dragon hoards, since
         // dragons are spawned separately (and there are 20 enemies per floor)
@@ -167,7 +168,7 @@ public:
             // generates coords for the enemy until it finds one that isn't on top of something else
             vector<int> enemyCoords;
             while (true) {
-                vector<int> tempCoords = getRandomSpawn(enemyChamberBounds, rng);
+                vector<int> tempCoords = getRandomSpawn(enemyChamberBounds);
                 if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
                     enemyCoords = tempCoords;
                     break;
@@ -352,10 +353,10 @@ public:
     	    }
 
 	        if (attack) {
-		        // for now they always hit, but
                 // enemy attacks have 50% accuracy
-                // let's say 0-49 is miss, 50-99 is hit
-                int rand = 50;
+                // 0-49 is miss, 50-99 is hit
+                uniform_int_distribution<int> hitChance(0,99);
+                int rand = hitChance(rng);
                 if (rand > 49) {
                     // The extra (100 + player DEF - 1) is there so it rounds up
                     int damage = ((100 + 100 + getPlayer()->getDEF() - 1)/(100 + getPlayer()->getDEF())) * enemy->getATK();

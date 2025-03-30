@@ -7,11 +7,13 @@
 #include "playerChar.h"
 #include "enemy.h"
 #include "enemyFactory.h"
+
 #include <sstream>
 #include <utility>
 #include <vector>
 #include <memory>
 #include <random>
+#include <chrono>
 
 class Game : public Subject {
     // a floors coords runs from (0, 0) to (24, 78)
@@ -19,15 +21,14 @@ class Game : public Subject {
     vector<shared_ptr<Floor>> floors;
     shared_ptr<PlayerChar> player;
 
-    unsigned seed; // randomizer
     int currentFloor;
     int goldScore;
 
     string commandLine;
 
 public:
-    Game(shared_ptr<PlayerChar> player, unsigned seed) 
-    : player{player}, seed{seed}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
+    Game(shared_ptr<PlayerChar> player) 
+    : player{player}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
         
         for(int i = 0; i < MAXFLOORS; ++i) {
             floors.push_back(make_shared<Floor>());
@@ -54,6 +55,7 @@ public:
 
     void initFloor() {
         shared_ptr<Floor> curFloor = getFloor(currentFloor);
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
         // RANDOMIZING PLAYER/STAIRS SPAWN
         vector<Floor::Chamber> chambers = curFloor->getChambers();
@@ -244,6 +246,12 @@ public:
             curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
             player->setPos(tempX, tempY);
             
+        } else if (nextTileType == "stairs") {
+            ++currentFloor;
+            initFloor();
+
+            actionResult = "You have made it to floor" + to_string(currentFloor);
+
         } else {
             actionResult = "You are trying to move out of bounds, try again.";
         } // more else ifs depending on what the tile is

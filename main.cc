@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <random>
-#include <chrono>
 
 using namespace std;
 
@@ -30,9 +29,7 @@ int main() {      // will need cmd line args at some point
             continue;
         }
 
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-
-        shared_ptr<Game> mainGame = make_shared<Game>(player, seed);
+        shared_ptr<Game> mainGame = make_shared<Game>(player);
         shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
         mainGame->initFloor();
         mainGame->displayGame();

@@ -27,6 +27,7 @@ public:
     bool getMoved();
     virtual bool isHostile();
 
+    void setHP(int newHP);
     void setPos(int newX, int newY);
     int getX();
     int getY();

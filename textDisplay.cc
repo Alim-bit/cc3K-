@@ -32,7 +32,7 @@ void TextDisplay::notify() {
     cout << "HP: " << player->getHP() << endl;
     cout << "Atk: " << player->getATK() << endl;
     cout << "Def: " << player->getDEF() << endl;
-    cout << "Action: " << subject->getCommandLine() << endl; 
+    cout << "Action: " << subject->getPlayerCommandLine() << subject->getEnemyCommandLine()  << endl; 
 }
 
 TextDisplay::~TextDisplay() {

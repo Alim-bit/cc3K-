@@ -60,6 +60,7 @@ int main() {      // will need cmd line args at some point
                 cin >> command;
 
                 // implement attack method
+                mainGame->attack(command);
 
             // QUIT/RESTART
             } else if (command == "q" || command == "r") {

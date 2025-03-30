@@ -20,6 +20,10 @@ bool Enemy::getMoved() { return hasMoved; }
 
 bool Enemy::isHostile() { return true; }
 
+void Enemy::setHP(int newHP) {
+    HP = newHP;
+}
+
 void Enemy::setPos(int newX, int newY) {
     x = newX;
     y = newY;

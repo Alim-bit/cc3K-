@@ -24,11 +24,15 @@ class Game : public Subject {
     int currentFloor;
     int goldScore;
 
-    string commandLine;
+    // so we can display both the player
+    // and enemy action in a turn.
+    // See Figure 3 in cc3k+ pdf.
+    string playerCommandLine;
+    string enemyCommandLine;
 
 public:
     Game(shared_ptr<PlayerChar> player, default_random_engine rng) 
-    : player{player}, rng{rng}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
+    : player{player}, rng{rng}, currentFloor{1}, goldScore{0}, playerCommandLine{"Player character has spawned."}, enemyCommandLine{""} {
 
         for(int i = 0; i < MAXFLOORS; ++i) {
             floors.push_back(make_shared<Floor>());
@@ -204,12 +208,20 @@ public:
         notifyObservers();
     }
 
-    void setCommandLine(string &command) {
-        commandLine = command;
+    void setPlayerCommandLine(string &command) {
+        playerCommandLine = command;
     }
 
-    string getCommandLine() {
-        return commandLine;
+    string getPlayerCommandLine() {
+        return playerCommandLine;
+    }
+
+    void setEnemyCommandLine(string &command) {
+        enemyCommandLine = command;
+    }
+
+    string getEnemyCommandLine() {
+        return enemyCommandLine;
     }
 
     // game logic
@@ -322,7 +334,82 @@ public:
             actionResult = "You are trying to move out of bounds, try again.";
         } // more else ifs depending on what the tile is
 
-        setCommandLine(actionResult);
+        setPlayerCommandLine(actionResult);
+    }
+
+    void attack(string dir) {
+        int tempX = player->getX();
+        int tempY = player->getY();
+
+        if (dir == "no") { 
+            tempY -= 1;
+        } else if (dir == "so") {
+            tempY += 1;
+        } else if (dir == "ea") {
+            tempX += 1;
+        } else if (dir == "we") {
+            tempX -= 1;
+        } else if (dir == "ne") {
+            tempX += 1;
+            tempY -= 1;
+        } else if (dir == "nw") {
+            tempX -= 1;
+            tempY -= 1;
+        } else if (dir == "se") {
+            tempX += 1;
+            tempY += 1;
+        } else if (dir == "sw") {
+            tempX -= 1;
+            tempY += 1;
+        }
+
+        string actionResult;
+        shared_ptr<Floor> curFloor = getFloor(currentFloor);
+        
+        // check attackTile for enemy
+        shared_ptr<Tile> attackTile = curFloor->getTile(tempX, tempY);
+        string attackTileType = attackTile->getType();
+
+        // if enemy
+        if (attackTileType == "enemy") {
+            shared_ptr<Enemy> enemy = attackTile->getEnemy();
+            int damage = ((100 + 100 + enemy->getDEF() - 1)/(100 + enemy->getDEF())) * player->getATK();
+            
+            enemy->setHP(enemy->getHP() - damage);
+            ostringstream oss;
+            // if enemy is defeated
+            if (enemy->getHP() <= 0) {
+                // this should delete the enemey when attack function ends
+                // since all the shared_ptrs are gone.
+                attackTile->setType(Tile::EMPTY);
+                attackTile->setEnemy(nullptr);
+                if (!(enemy->getName() == "Merchant" || enemy->getName() == "Dragon")) {
+                    // Player ability here
+                    // goldScore += player->playerAbility(1);
+                    // For now, just gives 1 gold
+                    goldScore += 1;
+                }
+                oss << "PC defeated " << enemy->getSymbol() << ".";
+                actionResult += oss.str();
+            // if enemy is not defeated
+            } else {
+                
+                oss << "PC deals " << damage << " damage to " << enemy->getSymbol() << " (" << enemy->getHP() << " HP).";
+                actionResult += oss.str();
+            }
+
+        // if empty    
+        } else if (attackTileType == "empty") {
+            
+            actionResult = "You attack the empty air.";
+        
+        // if anything else    
+        } else {
+            actionResult = "You can't attack that.";
+        }
+
+        setPlayerCommandLine(actionResult);
+
     }
 
     void enemyMove(shared_ptr<Enemy> enemy) {
@@ -359,19 +446,20 @@ public:
                 int rand = hitChance(rng);
                 if (rand > 49) {
                     // The extra (100 + player DEF - 1) is there so it rounds up
-                    int damage = ((100 + 100 + getPlayer()->getDEF() - 1)/(100 + getPlayer()->getDEF())) * enemy->getATK();
+                    int damage = ((100 + 100 + player->getDEF() - 1)/(100 + player->getDEF())) * enemy->getATK();
                     // if (BarrierSuit) {
                     // damage = ceil(damage / 2) 
                     // }
-                    getPlayer()->setHP(getPlayer()->getHP() - damage);
+                    player->setHP(player->getHP() - damage);
                     ostringstream oss;
-                    oss << enemy->getSymbol() << " deals " << damage << " damage to PC.";
+                    oss << " " << enemy->getSymbol() << " deals " << damage << " damage to PC.";
                     actionResult += oss.str();
                 } else {
+                    actionResult += " ";
 		            actionResult += enemy->getSymbol();
                     actionResult += " attacks PC but misses.";
                 }
-		        setCommandLine(actionResult);
+		        setEnemyCommandLine(actionResult);
 	        } else {
 	    	    // randomly selects a move out of validMoves
 		        if (validMoves.size() != 0) {
@@ -383,6 +471,7 @@ public:
 			        nextTile->setEnemy(enemy);
 			        enemy->setPos(newCoords.first, newCoords.second);
 			        curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+                    curFloor->getTile(curX, curY)->setEnemy(nullptr);
                 }
 	        }
 
@@ -391,7 +480,9 @@ public:
     }
 
     void enemyRound() {
-	    shared_ptr<Floor> curFloor = getFloor(currentFloor);    
+	    shared_ptr<Floor> curFloor = getFloor(currentFloor);
+        string empty = "";  
+        setEnemyCommandLine(empty); 
     	for (int i = 0; i < 79; i++) {
 	        for (int j = 0; j < 25; j++) {
 	            if (curFloor->getTile(i,j)->getType() == "enemy") {

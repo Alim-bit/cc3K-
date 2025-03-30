@@ -30,15 +30,5 @@
 - Player vs Enemy battle mechanics
 - Enemy character display in `Tile` class
 
-### **Items Class**
-- Potion generation
-- Implement `usePotion` method (must be within 1 block radius of potion)
-- Potions are unknown until used or bought from a merchant
-- Implement permanent vs temp potions:
-  - Stats cannot drop below 0
-  - Temp potions disappear when entering a new floor
-- Item character display in `Tile` class
-- Treasure generation (implement enemy behavior of Dragons/Merchants)
-- Implement major items
 
 ---

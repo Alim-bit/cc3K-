@@ -247,7 +247,7 @@ public:
             player->setPos(tempX, tempY);
             
         } else if (nextTileType == "stairs") {
-            ++currentFloor;
+            currentFloor += 1;
             initFloor();
 
             actionResult = "You have made it to floor" + to_string(currentFloor);

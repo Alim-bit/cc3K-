@@ -131,51 +131,56 @@ public:
         }
 
 
-        // SPAWN GOLD 
-        /*
+        // SPAWN GOLD
         int numGoldPiles = 10;
-        // Build a gold pool based on probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
-        vector<string> goldPool;
-        for (int i = 0; i < 5; ++i) {
-            goldPool.push_back("NormalGold");
-        }
-        for (int i = 0; i < 1; ++i) {
-            goldPool.push_back("DragonHoardGold");
-        }
-        for (int i = 0; i < 2; ++i) {
-            goldPool.push_back("SmallHoardGold");
-        }
-        for (int i = 0; i < numGoldPiles; ++i) {
-            vector<int> chamberIndices(chambers.size());
-            for (size_t j = 0; j < chambers.size(); ++j) {
-                chamberIndices[j] = j;
+        //int numDragonHoards = 0
+        uniform_int_distribution<int> goldProbability(1,8);
+        // probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
+        for (int i = 0; i < numGoldPiles; i++) {
+            int randGold = goldProbability(rng);
+            shared_ptr<Item> spawnedGold;
+            if (randGold <= 5) {
+                spawnedGold = ItemFactory::createItem("NG");
+            } else if (randGold <= 7) {
+                spawnedGold = ItemFactory::createItem("SH");
+            } else {
+                spawnedGold = ItemFactory::createItem("DH");
+                // numDragonHoards++;
             }
-            shuffle(chamberIndices.begin(), chamberIndices.end(), rng);
-            int chosenIndex = chamberIndices[0];
-            Floor::Chamber chosenChamber = chambers.at(chosenIndex);
             
-            vector<vector<int>> bounds = curFloor->getChamberBounds(chosenChamber);
-            vector<int> coords = getRandomSpawn(bounds);
-            int x = coords.at(0);
-            int y = coords.at(1);
-            shared_ptr<Tile> tile = curFloor->getTile(x, y);
-        if (tile->getType() == "empty") {
-            // Shuffle a copy of the gold pool and choose the first type
-            vector<string> tempGoldPool = goldPool;
-            shuffle(tempGoldPool.begin(), tempGoldPool.end(), rng);
-                string gType = tempGoldPool[0];
-                unique_ptr<Item> gold = ItemFactory::create(gType, tile->getCell(), curFloor.get());
-                tile->setType("gold");
-                curFloor->addItem(move(gold));
+            shuffle(chambers.begin(), chambers.end(), rng);
+            Floor::Chamber goldSpawn = chambers.at(0);
+            vector<vector<int>> goldChamberBounds = curFloor->getChamberBounds(goldSpawn);
+
+            // generates coords for the gold until it finds one that isn't on top of something else
+            vector<int> goldCoords;
+            while (true) {
+                vector<int> tempCoords = getRandomSpawn(goldChamberBounds);
+                if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
+                    goldCoords = tempCoords;
+                    break;
+                }
             }
+            int goldX = goldCoords.at(0);
+            int goldY = goldCoords.at(1);
+
+            curFloor->getTile(goldX, goldY)->setType(Tile::ITEM);
+            spawnedGold->setPos(goldX, goldY);
+            curFloor->getTile(goldX, goldY)->setItem(spawnedGold);
+
+            /* if (spawnedGold->getName == "DH") {
+                basically make a dragon, then randomize its
+                position to the 8 squares around the gold's
+                position, then make them both part of a 
+                protected item pair.
+            }
+            */
         }
-        */
 
         // SPAWN ENEMIES
         // With items, will be i < 20 - number of dragon hoards, since
         // dragons are spawned separately (and there are 20 enemies per floor)
-        int numDragonHoards = 0;
-	int numEnemies = 20 - numDragonHoards;
+	    int numEnemies = 20; //- numDragonHoards;
         uniform_int_distribution<int> enemyProbability(1,18);
          for (int i = 0; i < numEnemies; i++) {
             shared_ptr<Enemy> spawnedEnemy = EnemyFactory::createEnemy(enemyProbability(rng));

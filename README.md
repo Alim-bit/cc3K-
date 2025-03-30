@@ -18,20 +18,23 @@
 
 ## Things to Do:
 
+### **Text Display Mechanics**
+- ASCII colour output codes for player, enemies, treasure, potions
+- https://medium.com/@vitorcosta.matias/print-coloured-texts-in-console-a0db6f589138 for guide
+
 ### **Player Mechanics**
 - Player ability must be applied correctly
 - Proper generation order (IN PROGRESS)
 
 ### **Enemy Class**
 - Merchant/Dragon specific behavior
+- Implementation of Merchants dropping merchant hoards/an enemy dropping compass on death
 
 ### **Items Class**
-- Potion generation
 - Implement `usePotion` method (must be within 1 block radius of potion)
-- Potions are unknown until used or bought from a merchant
+- Potions are unknown until used or bought from a merchant (Buying from merchants is optional)
 - Implement permanent vs temp potions:
   - Stats cannot drop below 0
   - Temp potions disappear when entering a new floor
-- Item character display in `Tile` class
-- Treasure generation (implement enemy behavior of Dragons/Merchants)
+- Protected item implementation
 - Implement major items

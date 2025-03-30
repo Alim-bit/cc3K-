@@ -7,11 +7,13 @@
 #include "playerChar.h"
 #include "enemy.h"
 #include "enemyFactory.h"
+
 #include <sstream>
 #include <utility>
 #include <vector>
 #include <memory>
 #include <random>
+#include <chrono>
 
 class Game : public Subject {
     // a floors coords runs from (0, 0) to (24, 78)
@@ -19,15 +21,14 @@ class Game : public Subject {
     vector<shared_ptr<Floor>> floors;
     shared_ptr<PlayerChar> player;
 
-    unsigned seed; // randomizer
     int currentFloor;
     int goldScore;
 
     string commandLine;
 
 public:
-    Game(shared_ptr<PlayerChar> player, unsigned seed) 
-    : player{player}, seed{seed}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
+    Game(shared_ptr<PlayerChar> player) 
+    : player{player}, currentFloor{1}, goldScore{0}, commandLine{"Player character has spawned."} {
         
         for(int i = 0; i < MAXFLOORS; ++i) {
             floors.push_back(make_shared<Floor>());
@@ -35,8 +36,7 @@ public:
     }
 
     // HELPER FUNCTION TO RANDOMIZE SPAWNS
-    vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds, unsigned seed) {
-        default_random_engine rng{seed};
+    vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds, default_random_engine rng) {
         shuffle(chamberBounds.begin(), chamberBounds.end(), rng);
         vector<int> spawnRow = chamberBounds.at(0);
 
@@ -55,6 +55,7 @@ public:
 
     void initFloor() {
         shared_ptr<Floor> curFloor = getFloor(currentFloor);
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
         // RANDOMIZING PLAYER/STAIRS SPAWN
         vector<Floor::Chamber> chambers = curFloor->getChambers();
@@ -65,13 +66,13 @@ public:
 
         // get random spawn for player
         vector<vector<int>> playerChamberBounds = curFloor->getChamberBounds(playerSpawn);
-        vector<int> playerCoords = getRandomSpawn(playerChamberBounds, seed);
+        vector<int> playerCoords = getRandomSpawn(playerChamberBounds, rng);
         int playerX = playerCoords.at(0);
         int playerY = playerCoords.at(1);
 
         // get random spawn for stairs
         vector<vector<int>> stairsChamberBounds = curFloor->getChamberBounds(stairsSpawn);
-        vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds, seed);
+        vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds, rng);
         int stairsX = stairsCoords.at(0);
         int stairsY = stairsCoords.at(1);
 
@@ -154,16 +155,32 @@ public:
         }
 
         // SPAWN ENEMIES
+        // With items, will be i < 20 - number of dragon hoards, since
+        // dragons are spawned separately (and there are 20 enemies per floor)
+        uniform_int_distribution<int> enemyProbability(1,18);
+         for (int i = 0; i < 20; i++) {
+            shared_ptr<Enemy> spawnedEnemy = EnemyFactory::createEnemy(enemyProbability(rng));
 
-	    // testing an enemy spawn
-	    int x = 27;
-	    int y = 6;
+            shuffle(chambers.begin(), chambers.end(), rng);
+            Floor::Chamber enemySpawn = chambers.at(0);
+            vector<vector<int>> enemyChamberBounds = curFloor->getChamberBounds(enemySpawn);
 
-        // no randomness yet, only generates werewolf
-	    shared_ptr<Enemy> enemyTest = EnemyFactory::createEnemy();
-	    curFloor->getTile(x, y)->setType(Tile::ENEMY); // sets enemyTest spawn
-        curFloor->getTile(x, y)->setEnemy(enemyTest);
-	    enemyTest->setPos(x, y);
+            // generates coords for the enemy until it finds one that isn't on top of something else
+            vector<int> enemyCoords;
+            while (true) {
+                vector<int> tempCoords = getRandomSpawn(enemyChamberBounds, rng);
+                if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
+                    enemyCoords = tempCoords;
+                    break;
+                }
+            }
+            int enemyX = enemyCoords.at(0);
+            int enemyY = enemyCoords.at(1);
+
+            curFloor->getTile(enemyX, enemyY)->setType(Tile::ENEMY);
+            spawnedEnemy->setPos(enemyX, enemyY);
+            curFloor->getTile(enemyX, enemyY)->setEnemy(spawnedEnemy);
+        }
 	
     }
 
@@ -295,6 +312,12 @@ public:
             curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
             player->setPos(tempX, tempY);
             
+        } else if (nextTileType == "stairs") {
+            currentFloor += 1;
+            initFloor();
+
+            actionResult = "You have made it to floor" + to_string(currentFloor);
+
         } else {
             actionResult = "You are trying to move out of bounds, try again.";
         } // more else ifs depending on what the tile is

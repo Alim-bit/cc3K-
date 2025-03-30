@@ -2,6 +2,7 @@
 #define TILE_H
 
 #include <string>
+#include <memory>
 #include "enemy.h"
 
 class Tile {

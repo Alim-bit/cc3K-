@@ -9,10 +9,8 @@ class EnemyFactory {
 
 public:
     // returns a random enemy (excluding dragon)
-    static std::shared_ptr<Enemy> createEnemy(int rand);
+    static std::shared_ptr<Enemy> createEnemy(std::string name);
     
-    // returns a dragon
-    static std::shared_ptr<Enemy> createDragon();
 };
 
 #endif

@@ -4,7 +4,7 @@
 using namespace std;
 
 Enemy::Enemy( string name, char symbol, int maxhp, int hp, int atk, int def )
-: name{name}, symbol{symbol}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0}, hasMoved{false} {}
+: name{name}, symbol{symbol}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, x{0}, y{0}, hasMoved{false}, holdingCompass{false} {}
 
 int Enemy::getHP() { return HP; }
 
@@ -43,4 +43,12 @@ void Enemy::setMoved() {
 
 void Enemy::resetMoved() {
     hasMoved = false;
+}
+
+void Enemy::setHolding() {
+    holdingCompass = true;
+}
+
+bool Enemy::getHolding() {
+   return holdingCompass;
 }

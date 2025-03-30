@@ -12,17 +12,14 @@
 
 using namespace std;
 
-shared_ptr<Enemy> EnemyFactory::createEnemy(int rand) {
-    // generate # between 1-18 
-    if (rand <= 4) { return make_shared<Werewolf>(); }
-    else if (rand > 4 && rand < 8) { return make_shared<Vampire>(); }
-    else if (rand > 7 && rand < 13) { return make_shared<Goblin>(); }
-    else if (rand > 12 && rand < 15) { return make_shared<Troll>(); }
-    else if (rand > 14 && rand < 17) { return make_shared<Phoenix>(); }
-    else { return make_shared<Merchant>(); }
-}
+shared_ptr<Enemy> EnemyFactory::createEnemy(string name) {
+    
+    if (name == "Werewolf") { return make_shared<Werewolf>(); }
+    else if (name == "Vampire") { return make_shared<Vampire>(); }
+    else if (name == "Goblin") { return make_shared<Goblin>(); }
+    else if (name == "Troll") { return make_shared<Troll>(); }
+    else if (name == "Phoenix") { return make_shared<Phoenix>(); }
+    else if (name == "Merchant") { return make_shared<Merchant>(); }
+    else { return make_shared<Dragon>(); }
 
-shared_ptr<Enemy> EnemyFactory::createDragon() {
-    // Gets called when dragon hoard or Barrier Suit is spawned
-    return make_shared<Dragon>();
 }

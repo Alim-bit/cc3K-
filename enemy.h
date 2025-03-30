@@ -14,6 +14,7 @@ protected:
   
     int x, y;
     bool hasMoved;
+    bool holdingCompass;
 
 public:
     Enemy(std::string name, char symbol, int maxhp, int hp, int atk, int def);
@@ -33,6 +34,8 @@ public:
     int getY();
     void setMoved();
     void resetMoved();
+    void setHolding();
+    bool getHolding();
 
 };
 

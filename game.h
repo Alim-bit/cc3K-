@@ -183,7 +183,21 @@ public:
 	    int numEnemies = 20; //- numDragonHoards;
         uniform_int_distribution<int> enemyProbability(1,18);
          for (int i = 0; i < numEnemies; i++) {
-            shared_ptr<Enemy> spawnedEnemy = EnemyFactory::createEnemy(enemyProbability(rng));
+            int randEnemy = enemyProbability(rng);
+            shared_ptr<Enemy> spawnedEnemy; 
+            if (randEnemy <= 4) {
+                spawnedEnemy = EnemyFactory::createEnemy("Werewolf");
+            } else if (randEnemy <= 7) {
+                spawnedEnemy = EnemyFactory::createEnemy("Vampire");
+            } else if (randEnemy <= 12) {
+                spawnedEnemy = EnemyFactory::createEnemy("Goblin");
+            } else if (randEnemy <= 14) {
+                spawnedEnemy = EnemyFactory::createEnemy("Troll");
+            } else if (randEnemy <= 16) {
+                spawnedEnemy = EnemyFactory::createEnemy("Phoenix");
+            } else {
+                spawnedEnemy = EnemyFactory::createEnemy("Merchant");
+            }
 
             shuffle(chambers.begin(), chambers.end(), rng);
             Floor::Chamber enemySpawn = chambers.at(0);
@@ -204,6 +218,13 @@ public:
             curFloor->getTile(enemyX, enemyY)->setType(Tile::ENEMY);
             spawnedEnemy->setPos(enemyX, enemyY);
             curFloor->getTile(enemyX, enemyY)->setEnemy(spawnedEnemy);
+
+            if (i == 0) {
+                // if this is the first enemy generated,
+                // have it drop compass on death. Equivalent
+                // to 1/20 chance for enemy to have it.
+                spawnedEnemy->setHolding();
+            }
         }
 	
     }
@@ -296,7 +317,7 @@ public:
             player->setPos(tempX, tempY);
             curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
             
-            actionResult = "PC moves " + direction;
+            actionResult = "PC moves " + direction + ".";
         
         // if passage
         } else if (nextTileType == "passage") {
@@ -304,7 +325,7 @@ public:
             player->setPos(tempX, tempY);
             curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
             
-            actionResult = "PC crawls " + direction;
+            actionResult = "PC crawls " + direction + ".";
 
         // if door
         } else if (nextTileType == "door") {
@@ -322,7 +343,7 @@ public:
 
                 curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
                 player->setInPassage(false);
-                actionResult = "PC crawled out of the passage";
+                actionResult = "PC crawled out of the passage.";
 
             } else {
                 // find passage tile
@@ -338,7 +359,7 @@ public:
 
                 curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
                 player->setInPassage(true);
-                actionResult = "PC entered a passage";
+                actionResult = "PC entered a passage.";
             }
 
             curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
@@ -349,7 +370,7 @@ public:
 
             if (currentFloor <= 5) { // as long as we aren't at the 5th floor yet, since otherwise we beat the game moving to the 6th
                 initFloor();
-                actionResult = "You have made it to floor " + to_string(currentFloor);
+                actionResult = "You have made it to floor " + to_string(currentFloor) + ".";
             }
 
         } else {
@@ -399,23 +420,43 @@ public:
             
             enemy->setHP(enemy->getHP() - damage);
             ostringstream oss;
+
             // if enemy is defeated
             if (enemy->getHP() <= 0) {
                 // this should delete the enemey when attack function ends
                 // since all the shared_ptrs are gone.
                 attackTile->setType(Tile::EMPTY);
                 attackTile->setEnemy(nullptr);
+
+                // Enemy is holding compass
+                if (enemy->getHolding()) {
+                    shared_ptr<Item> compass = ItemFactory::createItem("C");
+                    attackTile->setType(Tile::ITEM);
+                    attackTile->setItem(compass);
+                    compass.setPos(tempX, tempY);
+                }
+
+                // Enemy is a merchant, drops merchant hoard
+                if (enemy->getName() == "Merchant") {
+                    shared_ptr<Item> newMerchHoard = ItemFactory::createItem("MH");
+                    attackTile->setType(Tile::ITEM);
+                    attackTile->setItem(newMerchHoard);
+                    cnewMerchHoard.setPos(tempX, tempY);
+                }
+
+                // Enemy is not merchant/dragon
                 if (!(enemy->getName() == "Merchant" || enemy->getName() == "Dragon")) {
                     // Player ability here
                     // goldScore += player->playerAbility(1);
                     // For now, just gives 1 gold
                     goldScore += 1;
                 }
+
                 oss << "PC defeated " << enemy->getSymbol() << ".";
                 actionResult += oss.str();
+
             // if enemy is not defeated
             } else {
-                
                 oss << "PC deals " << damage << " damage to " << enemy->getSymbol() << " (" << enemy->getHP() << " HP).";
                 actionResult += oss.str();
             }

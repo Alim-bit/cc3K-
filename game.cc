@@ -395,6 +395,7 @@ void Game::move(string dir) {
 
     // if door
     } else if (nextTileType == "door") {
+        bool enemyBlocking = false; // to check if enemy is blocking a door
         if (player->isInPassage()) {
             // find empty tile
             if (curFloor->getTile(tempX + 1, tempY)->getType() == "empty") {
@@ -403,13 +404,20 @@ void Game::move(string dir) {
                 tempX -= 1;
             } else if (curFloor->getTile(tempX, tempY + 1)->getType() == "empty") {
                 tempY += 1;
-            } else {
+            } else if (curFloor->getTile(tempX, tempY - 1)->getType() == "empty"){
                 tempY -= 1;
+            } else { // an enemy is blocking the door
+                enemyBlocking = true;
             }
-
-            curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
-            player->setInPassage(false);
-            actionResult = "PC crawled out of the passage.";
+            
+            // if an enemy blocks the door
+            if (enemyBlocking) {
+                actionResult = "An enemy was blocking the door, but now it might've left.";
+            } else { // otherwise
+                curFloor->getTile(curX, curY)->setType(Tile::PASSAGE);
+                player->setInPassage(false);
+                actionResult = "PC crawled out of the passage.";
+            }
 
         } else {
             // find passage tile
@@ -428,10 +436,13 @@ void Game::move(string dir) {
             actionResult = "PC entered a passage.";
         }
 
-        curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
-        player->setPos(tempX, tempY);
+        // only move out if theres no enemy blocking the door
+        if (!enemyBlocking) {
+            curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
+            player->setPos(tempX, tempY);
+        }
             
-  
+    // if item
     } else if (nextTileType == "item") {
         // Get the item from the tile
         auto item = nextTile->getItem();
@@ -490,6 +501,8 @@ void Game::move(string dir) {
                 actionResult = "You can't walk on that.";
             }
         }
+    
+    // if stairs
     } else if (nextTileType == "stairs") {
         currentFloor += 1;
 
@@ -498,9 +511,14 @@ void Game::move(string dir) {
             actionResult = "You have made it to floor " + to_string(currentFloor) + ".";
         }
 
+    // if enemy
+    } else if (nextTileType == "enemy") {
+        actionResult = "An enemy stands in your way.";
+    
+    // if any boundary
     } else {
         actionResult = "You are trying to move out of bounds, try again.";
-    } // more else ifs depending on what the tile is
+    }
 
     setPlayerCommandLine(actionResult);
 }

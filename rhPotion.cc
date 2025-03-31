@@ -8,4 +8,7 @@ bool RHPotion::isKnown() {
     return known;
 }
 
+bool RHPotion::makeKnown() {
+    RHPotion::known = true;
+}
 

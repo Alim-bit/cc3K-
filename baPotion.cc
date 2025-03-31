@@ -12,3 +12,4 @@ bool BAPotion::isKnown() {
 void BAPotion::makeKnown() {
     BAPotion::known = true;
 }
+

@@ -8,6 +8,7 @@ class RHPotion : public Item {
 public:
     RHPotion();
     bool isKnown();
+    void makeKnown();
 };
 
 #endif // RHPOTION_H

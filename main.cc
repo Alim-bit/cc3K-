@@ -54,6 +54,7 @@ int main() {      // will need cmd line args at some point
                 cin >> command;
 
                 // implement use potion method
+                mainGame->useItem(command);
 
             // ATTACK ENEMY IN DIRECTION
             } else if (command == "a") {

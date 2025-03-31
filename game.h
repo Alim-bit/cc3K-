@@ -88,7 +88,7 @@ public:
 
         // SET STAIRS SPAWN
         curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
-        curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
+        //curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
         // SPAWN POTIONS
         int numPotions = 10;
@@ -313,6 +313,8 @@ public:
         shared_ptr<Tile> nextTile = curFloor->getTile(tempX, tempY);
         string nextTileType = nextTile->getType();
 
+        
+
         // if empty
         if (nextTileType == "empty") {
             nextTile->setType(Tile::PLAYER);
@@ -367,28 +369,28 @@ public:
             curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
             player->setPos(tempX, tempY);
             
+  
         } else if (nextTileType == "item") {
             // Get the item from the tile
             auto item = nextTile->getItem();
             if (item) {
-                item->pickUp();
-                if (item->getName() == "C") {
-                    // When picking up the Compass, reveal the stairs.
-                    curFloor->getTile(stairsX, stairsY)->setStairsVisible();
-                    actionResult = "PC picks up the Compass; the stairs are now visible.";
+                if (item->getName() == "C" || item->getName() == "NG" || 
+                    item->getName() == "SH" || item->getName() == "MH") {
+                    // Uses item, then walks on to spot where item was
+                    useItem(dir);
+
+                    nextTile->setType(Tile::PLAYER);
+                    player->setPos(tempX, tempY);
+                    curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
+
+                } else if (item->getName() == "DH" || item->getName() == "BS") {
+                    // check if protector is gone before
+                    // useItem(dir)
+                    // if not:
+                    actionResult = "You can't collect that right now!";
+                } else {
+                    actionResult = "You can't walk on that.";
                 }
-                else if (item->getName() == "NG" || item->getName() == "SH" ||
-                         item->getName() == "MH" || item->getName() == "DH") {
-                    // For gold items, update the gold score.
-                    goldScore += item->getValue();
-                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
-                }
-                else {
-                    actionResult = "PC picks up " + item->getName() + ".";
-                }
-                // Remove the item from the tile
-                nextTile->setType(Tile::EMPTY);
-                nextTile->setItem(nullptr);
             }
         } else if (nextTileType == "stairs") {
             currentFloor += 1;
@@ -504,6 +506,73 @@ public:
 
         setPlayerCommandLine(actionResult);
 
+    }
+
+    void useItem(string dir) {
+        int tempX = player->getX();
+        int tempY = player->getY();
+
+        if (dir == "no") { 
+            tempY -= 1;
+        } else if (dir == "so") {
+            tempY += 1;
+        } else if (dir == "ea") {
+            tempX += 1;
+        } else if (dir == "we") {
+            tempX -= 1;
+        } else if (dir == "ne") {
+            tempX += 1;
+            tempY -= 1;
+        } else if (dir == "nw") {
+            tempX -= 1;
+            tempY -= 1;
+        } else if (dir == "se") {
+            tempX += 1;
+            tempY += 1;
+        } else if (dir == "sw") {
+            tempX -= 1;
+            tempY += 1;
+        }
+
+        string actionResult;
+        shared_ptr<Floor> curFloor = getFloor(currentFloor);
+
+        // check itemTile for enemy
+        shared_ptr<Tile> itemTile = curFloor->getTile(tempX, tempY);
+        string itemTileType = itemTile->getType();
+
+        if (itemTileType == "item") {
+            // Get the item from the tile
+            auto item = itemTile->getItem();
+            if (item) {
+                item->pickUp();
+                if (item->getName() == "C") {
+                    // When picking up the Compass, reveal the stairs.
+                    curFloor->getTile(stairsX, stairsY)->setStairsVisible();
+                    actionResult = "PC picks up the Compass; the stairs are now visible.";
+                }
+                else if (item->getName() == "NG" || item->getName() == "SH" ||
+                         item->getName() == "MH" || item->getName() == "DH") {
+                    // For gold items, update the gold score.
+                    // goldScore += player->collectGold(item->getValue());
+                    goldScore += item->getValue();
+                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                }
+                else if (item->getName() == "BS") {
+                    actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
+                    // barrierSuit = true
+                } else {
+                    // Special function based on race
+                    //player->drinkPotion(item->getName());
+			actionResult = "PC drank a potion (not implemented!!)";
+                }
+                // Remove the item from the tile
+                itemTile->setType(Tile::EMPTY);
+                itemTile->setItem(nullptr);
+
+		setPlayerCommandLine(actionResult);
+            }
+        }
     }
 
     void enemyMove(shared_ptr<Enemy> enemy) {

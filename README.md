@@ -1,6 +1,6 @@
 # cc3K+
 
-## AVOID PUSHING .o and .d FILESgit push origin main ALSO ANY EXECUTABLE YOU MAKEgit push origin main
+## AVOID PUSHING .o and .d FILES ALSO ANY EXECUTABLE YOU MAKE
 
 ---
 
@@ -18,19 +18,20 @@
 
 ## Things to Do:
 
-### **Text Display Mechanics**
+### **Other Mechanics**
 - ASCII colour output codes for player, enemies, treasure, potions
 - https://medium.com/@vitorcosta.matias/print-coloured-texts-in-console-a0db6f589138 for guide
+- generating floors based off a command line argument file
 
 ### **Player Mechanics**
 - Player ability must be applied correctly
 - Proper generation order (IN PROGRESS)
 
 ### **Enemy Class**
-- Merchant/Dragon specific behavior
+- Implement Dragon hositlity when PC is near its gold (needs protected item implementation)
 
 ### **Items Class**
-- Implement `usePotion` method (must be within 1 block radius of potion)
+- Implement `usePotion`/pickUp method (must be within 1 block radius of potion)
 - Potions are unknown until used or bought from a merchant (Buying from merchants is optional)
 - Implement permanent vs temp potions:
   - Stats cannot drop below 0

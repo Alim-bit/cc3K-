@@ -366,8 +366,8 @@ void Game::move(string dir) {
                 } else {
                     if (player->getRace() == "Orc") {
                         actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
-                    } else if (player->getRace() == "Elf") {
-                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an elf.";
+                    } else if (player->getRace() == "Dwarf") {
+                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an dwarf.";
                     } else {
                         actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
                     }
@@ -474,7 +474,7 @@ void Game::attack(string dir) {
 
                 if (player->getRace() == "Orc") {
                     goldScore += 0.5;
-                } else if (player->getRace() == "Elf") {
+                } else if (player->getRace() == "Dwarf") {
                     goldScore += 2;
                 } else {
                     goldScore += 1;
@@ -560,7 +560,7 @@ void Game::useItem(string dir) {
                 if (player->getRace() == "Orc") {
                     goldScore += static_cast<double>(item->getValue()) / 2;
                     actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
-                } else if (player->getRace() == "Elf") {
+                } else if (player->getRace() == "Dwarf") {
                     goldScore += item->getValue() * 2;
                     actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an elf.";
                 } else {

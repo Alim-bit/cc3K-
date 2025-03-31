@@ -83,3 +83,4 @@ bool PlayerChar::hasBarrierSuit() {
 void PlayerChar::setBarrierSuit() {
     barrierSuit = true;
 }
+

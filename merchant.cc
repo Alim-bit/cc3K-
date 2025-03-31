@@ -9,3 +9,4 @@ void Merchant::makeHostile() {
 bool Merchant::isHostile() {
     return Merchant::hostile;
 }
+

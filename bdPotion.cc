@@ -11,3 +11,4 @@ bool BDPotion::isKnown() {
 void BDPotion::makeKnown() {
     BDPotion::known = true;
 }
+

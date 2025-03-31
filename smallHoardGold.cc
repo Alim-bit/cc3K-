@@ -3,3 +3,4 @@
 
 SmallHoardGold::SmallHoardGold()
     : Item("SH", 'G', 2) {}
+

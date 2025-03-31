@@ -9,7 +9,7 @@
 #include "enemyFactory.h"
 #include "item.h"
 #include "itemFactory.h"
-
+#include "protectedItem.h"
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -141,21 +141,65 @@ public:
         for (int i = 0; i < numGoldPiles; i++) {
             int randGold = goldProbability(rng);
             shared_ptr<Item> spawnedGold;
+            
+            // generates coords for the gold until it finds one that isn't on top of something else
+            vector<int> goldCoords;
+            int goldX = goldCoords.at(0);
+            int goldY = goldCoords.at(1);
+
             if (randGold <= 5) {
                 spawnedGold = ItemFactory::createItem("NG");
             } else if (randGold <= 7) {
                 spawnedGold = ItemFactory::createItem("SH");
             } else {
+                // For a dragon hoard, first create the gold item.
                 spawnedGold = ItemFactory::createItem("DH");
-                // numDragonHoards++;
+
+                // Now, generate a dragon to protect this hoard.
+                std::shared_ptr<Enemy> dragon = EnemyFactory::createEnemy("Dragon");
+
+                // Build a vector of adjacent coordinates using std::make_pair.
+                vector<std::vector<int>> adjacentCoords = {
+                    {goldX - 1, goldY - 1},
+                    {goldX,     goldY - 1},
+                    {goldX + 1, goldY - 1},
+                    {goldX - 1, goldY},
+                    {goldX + 1, goldY},
+                    {goldX - 1, goldY + 1},
+                    {goldX,     goldY + 1},
+                    {goldX + 1, goldY + 1}
+                };
+
+                std::vector<int> dragonCoords(2, 0);
+                bool found = false;
+                // Look for an adjacent empty tile to place the dragon.
+                for (const auto &coords : adjacentCoords) {
+                    int x = coords[0];
+                    int y = coords[1];
+                    if (curFloor->getTile(x, y)->getType() == "empty") {
+                        dragonCoords = coords;  
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    dragonCoords = {goldX, goldY};
+                }
+            
+                curFloor->getTile(dragonCoords[0], dragonCoords[1])->setType(Tile::ENEMY);
+                dragon->setPos(dragonCoords[0], dragonCoords[1]);
+                curFloor->getTile(dragonCoords[0], dragonCoords[1])->setEnemy(dragon);
+
+                spawnedGold = std::make_shared<ProtectedItem>(spawnedGold, dragon);            
             }
+
+
             
             shuffle(chambers.begin(), chambers.end(), rng);
             Floor::Chamber goldSpawn = chambers.at(0);
             vector<vector<int>> goldChamberBounds = curFloor->getChamberBounds(goldSpawn);
 
-            // generates coords for the gold until it finds one that isn't on top of something else
-            vector<int> goldCoords;
+            
             while (true) {
                 vector<int> tempCoords = getRandomSpawn(goldChamberBounds);
                 if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
@@ -163,8 +207,7 @@ public:
                     break;
                 }
             }
-            int goldX = goldCoords.at(0);
-            int goldY = goldCoords.at(1);
+            
 
             curFloor->getTile(goldX, goldY)->setType(Tile::ITEM);
             spawnedGold->setPos(goldX, goldY);

@@ -1,14 +1,15 @@
 #include "protectedItem.h"
-#include "enemy.h"
+#include "enemy.h" // so we can call protector->getHP() and getName()
 #include <iostream>
 
-ProtectedItem::ProtectedItem(std::unique_ptr<Item> itm, std::shared_ptr<Enemy> prot)
-    : Item(itm->getName(), itm->getSymbol(), itm->getValue()),
-      item(std::move(itm)),
-      protector(prot) {}
-
 void ProtectedItem::pickUp() {
-    // In a full implementation, check if the protector is defeated
-    std::cout << "Attempting to pick up a protected item." << std::endl;
+    // If the protector is still alive, block pickup.
+    if (protector && protector->getHP() > 0) {
+        std::cout << "The " << item->getName() 
+                  << " is protected by " << protector->getName() 
+                  << ". Defeat it to pick up the item!" << std::endl;
+        return;
+    }
+    // Otherwise, delegate to the underlying item’s pickUp method.
     item->pickUp();
 }

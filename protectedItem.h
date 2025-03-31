@@ -4,18 +4,22 @@
 #include "item.h"
 #include <memory>
 
-// Forward declaration for Enemy
+// Forward declaration of Enemy so we can store a pointer
 class Enemy;
 
 class ProtectedItem : public Item {
 private:
-    // Own the contained item using a unique_ptr
-    std::unique_ptr<Item> item;
-    // Use a shared_ptr for the protector (assumed managed elsewhere)
+    // The actual item (e.g. a Dragon Hoard Gold)
+    std::shared_ptr<Item> item;
+    // The enemy protecting this item (e.g. the Dragon)
     std::shared_ptr<Enemy> protector;
 public:
-    ProtectedItem(std::unique_ptr<Item> itm, std::shared_ptr<Enemy> prot);
-    virtual ~ProtectedItem() = default;
+    // Constructor: takes the underlying item and its protector
+    ProtectedItem(std::shared_ptr<Item> itm, std::shared_ptr<Enemy> prot)
+        : Item(itm->getName(), itm->getSymbol(), itm->getValue()),
+          item(itm), protector(prot) {}
+
+    // Override the pickUp method
     virtual void pickUp() override;
 };
 

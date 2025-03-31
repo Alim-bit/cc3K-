@@ -209,7 +209,7 @@ shared_ptr<PlayerChar> Game::getPlayer() {
     return player;
 }
 
-int Game::getGoldScore() {
+double Game::getGoldScore() {
     return goldScore;
 }
 
@@ -364,7 +364,13 @@ void Game::move(string dir) {
                 if (item->getName() == "C") {
                     actionResult = "PC picks up the Compass; the stairs are now visible.";
                 } else {
-                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                    if (player->getRace() == "Orc") {
+                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
+                    } else if (player->getRace() == "Elf") {
+                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an elf.";
+                    } else {
+                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                    }
                 }
                 useItem(dir);
 
@@ -465,7 +471,14 @@ void Game::attack(string dir) {
                 // Player ability here
                 // goldScore += player->playerAbility(1);
                 // For now, just gives 1 gold
-                goldScore += 1;
+
+                if (player->getRace() == "Orc") {
+                    goldScore += 0.5;
+                } else if (player->getRace() == "Elf") {
+                    goldScore += 2;
+                } else {
+                    goldScore += 1;
+                }
             }
 
             oss << "PC defeated " << enemy->getSymbol() << ".";
@@ -544,8 +557,17 @@ void Game::useItem(string dir) {
                     item->getName() == "MH" || item->getName() == "DH") {
                 // For gold items, update the gold score.
                 // goldScore += player->collectGold(item->getValue());
-                goldScore += item->getValue();
-                actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                if (player->getRace() == "Orc") {
+                    goldScore += static_cast<double>(item->getValue()) / 2;
+                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
+                } else if (player->getRace() == "Elf") {
+                    goldScore += item->getValue() * 2;
+                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an elf.";
+                } else {
+                    goldScore += item->getValue();
+                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                }
+
             }
             else if (item->getName() == "BS") {
                 actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";

@@ -24,7 +24,7 @@ class Game : public Subject {
 
     default_random_engine rng; // randomizer
     int currentFloor;
-    int goldScore;
+    double goldScore;
 
     // so we can display both the player
     // and enemy action in a turn.
@@ -48,7 +48,7 @@ public:
 
     shared_ptr<PlayerChar> getPlayer();
 
-    int getGoldScore();
+    double getGoldScore();
 
     void displayGame();
 

@@ -24,6 +24,7 @@ class Game : public Subject {
 
     default_random_engine rng; // randomizer
     int currentFloor;
+    int BSFloor; // floor the barrier suit will spawn
     double goldScore;
 
     // so we can display both the player
@@ -35,7 +36,7 @@ class Game : public Subject {
     int stairsY;
 
 public:
-    Game(shared_ptr<PlayerChar> player, default_random_engine rng);
+    Game(shared_ptr<PlayerChar> player, default_random_engine rng, int BSFloor);
 
     // HELPER FUNCTION TO RANDOMIZE SPAWNS
     vector<int> getRandomSpawn(vector<vector<int>>& chamberBounds);

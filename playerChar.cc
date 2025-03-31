@@ -4,7 +4,7 @@
 using namespace std;
 
 PlayerChar::PlayerChar( string race, int maxhp, int hp, int atk, int def, int floor ) 
-: race{race}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, tempATKBonus{0}, tempDEFBonus{0},  x{0}, y{0}, inPassage{false} {}
+: race{race}, MAXHP{maxhp}, HP{hp}, ATK{atk}, DEF{def}, tempATKBonus{0}, tempDEFBonus{0},  x{0}, y{0}, inPassage{false}, barrierSuit{false} {}
 
 int PlayerChar::getHP() { return HP; }
 
@@ -74,4 +74,12 @@ void PlayerChar::drinkPotion(const std::string &potionType) {
 void PlayerChar::resetTempPotions() {
     tempATKBonus = 0;
     tempDEFBonus = 0;
+}
+
+bool PlayerChar::hasBarrierSuit() {
+    return barrierSuit;
+}
+
+void PlayerChar::setBarrierSuit() {
+    barrierSuit = true;
 }

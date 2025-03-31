@@ -2,8 +2,8 @@
 
 using namespace std;
 
-Game::Game(shared_ptr<PlayerChar> player, default_random_engine rng) 
-: player{player}, rng{rng}, currentFloor{1}, goldScore{0}, playerCommandLine{"Player character has spawned."}, enemyCommandLine{""} {
+Game::Game(shared_ptr<PlayerChar> player, default_random_engine rng, int BSFloor) 
+: player{player}, rng{rng}, currentFloor{1}, BSFloor{BSFloor}, goldScore{0}, playerCommandLine{"Player character has spawned."}, enemyCommandLine{""} {
 
     for(int i = 0; i < MAXFLOORS; ++i) {
         floors.push_back(make_shared<Floor>());
@@ -58,7 +58,7 @@ void Game::initFloor() {
 
     // SET STAIRS SPAWN
     curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
-    //curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
+    curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
     // SPAWN POTIONS
     int numPotions = 10;
@@ -105,7 +105,7 @@ void Game::initFloor() {
 
     // SPAWN GOLD
     int numGoldPiles = 10;
-    //int numDragonHoards = 0
+    int numDragonHoards = 0;
     uniform_int_distribution<int> goldProbability(1,8);
     // probabilities: normal (5/8), dragon hoard (1/8), small hoard (2/8)
     for (int i = 0; i < numGoldPiles; i++) {
@@ -117,7 +117,7 @@ void Game::initFloor() {
             spawnedGold = ItemFactory::createItem("SH");
         } else {
             spawnedGold = ItemFactory::createItem("DH");
-                // numDragonHoards++;
+                numDragonHoards++;
         }
             
         shuffle(chambers.begin(), chambers.end(), rng);
@@ -169,10 +169,64 @@ void Game::initFloor() {
         }
     }
 
+    // SPAWN BARRIER SUIT 
+    // If the floor the suit is on is the current
+    // floor, spawn barrier suit in a similar way
+    // to dragon hoards.
+    if (BSFloor == currentFloor) {
+        shared_ptr<Item> spawnedBS = ItemFactory::createItem("BS");
+        shuffle(chambers.begin(), chambers.end(), rng);
+        Floor::Chamber barrierSuitSpawn = chambers.at(0);
+        vector<vector<int>> barrierSuitChamberBounds = curFloor->getChamberBounds(barrierSuitSpawn);
+
+        // generates coords for the barrier suit until it finds one that isn't on top of something else
+        vector<int> barrierSuitCoords;
+        while (true) {
+            vector<int> tempCoords = getRandomSpawn(barrierSuitChamberBounds);
+            if (curFloor->getTile(tempCoords.at(0), tempCoords.at(1))->getType() == "empty") {
+                barrierSuitCoords = tempCoords;
+                break;
+            }
+        }
+        int barrierSuitX = barrierSuitCoords.at(0);
+        int barrierSuitY = barrierSuitCoords.at(1);
+
+        curFloor->getTile(barrierSuitX, barrierSuitY)->setType(Tile::ITEM);
+        spawnedBS->setPos(barrierSuitX, barrierSuitY);
+        curFloor->getTile(barrierSuitX, barrierSuitY)->setItem(spawnedBS);
+
+        // Spawns dragon and finds position for it in one of 8 tiles
+        // surrounding barrier suit. Makes dragon and hoard part
+        // of protectedItem pair.
+        shared_ptr<Enemy> dragon = EnemyFactory::createEnemy("Dragon");
+        vector<pair<int, int>> validTiles;
+        for (int i = barrierSuitX-1; i <= barrierSuitX+1; i++) {
+            for (int j = barrierSuitY-1; j <= barrierSuitY+1; j++) {
+                if (i != barrierSuitX || j != barrierSuitY) {
+                    if (curFloor->getTile(i, j)->getType() == "empty") {
+                        validTiles.emplace_back(make_pair(i,j));
+                    }
+                }
+            }
+        }
+        shuffle(validTiles.begin(), validTiles.end(), rng);
+        pair<int, int> newCoords = validTiles.at(0);
+        shared_ptr<Tile> newTile = curFloor->getTile(newCoords.first, newCoords.second);
+        newTile->setType(Tile::ENEMY);
+        newTile->setEnemy(dragon);
+        dragon->setPos(newCoords.first, newCoords.second);
+            
+        // giving access to each others' positions
+        spawnedBS->setProtected(true);
+        spawnedBS->setEnemyPos(newCoords.first, newCoords.second);
+        dragon->setItemPos(barrierSuitX, barrierSuitY);
+    }
+
+
     // SPAWN ENEMIES
     // With items, will be i < 20 - number of dragon hoards, since
     // dragons are spawned separately (and there are 20 enemies per floor)
-	int numEnemies = 20; //- numDragonHoards;
+	int numEnemies = 20 - numDragonHoards;
     uniform_int_distribution<int> enemyProbability(1,18);
     for (int i = 0; i < numEnemies; i++) {
         int randEnemy = enemyProbability(rng);
@@ -425,6 +479,10 @@ void Game::move(string dir) {
                     } else {
                         actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
                     }
+                    // move on top of square where protected item was.
+                    nextTile->setType(Tile::PLAYER);
+                    player->setPos(tempX, tempY);
+                    curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
                 } else {
                     actionResult = "Defeat the dragon to collect the item!";
                 }
@@ -612,7 +670,7 @@ void Game::useItem(string dir) {
             }
             else if (item->getName() == "BS") {
                 actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
-                // barrierSuit = true
+                player->setBarrierSuit();
             } else {
                 player->drinkPotion(item->getName());
                 actionResult = "PC drank a " + item->getName() + " potion.";
@@ -687,9 +745,10 @@ void Game::enemyMove(shared_ptr<Enemy> enemy) {
                 // The extra (100 + player DEF - 1) is there so it rounds up
                 int damage = ((100 + 100 + (player->getDEF() + player->getTempDEF()) - 1)/(100 + (player->getDEF() + player->getTempDEF()))) * enemy->getATK();
 
-                // if (BarrierSuit) {
-                // damage = ceil(damage / 2) 
-                // }
+                if (player->hasBarrierSuit()) {
+                    // the + 1 is for rounding up
+                    damage = (damage + 1) / 2;
+                }
 
                 player->setHP(player->getHP() - damage);
                 ostringstream oss;

@@ -14,6 +14,7 @@ protected:
     int tempDEFBonus; 
     int x, y;
     bool inPassage;
+    bool barrierSuit;
 
 public:
     PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
@@ -35,6 +36,9 @@ public:
 
     void drinkPotion(const std::string &potionType);
     void resetTempPotions();
+
+    bool hasBarrierSuit();
+    void setBarrierSuit();
 };
 
 #endif

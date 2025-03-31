@@ -32,7 +32,11 @@ int main() {      // will need cmd line args at some point
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 	    default_random_engine rng{seed};
 
-        shared_ptr<Game> mainGame = make_shared<Game>(player, rng);
+        //choosing barrier suit floor:
+        uniform_int_distribution<int> BSProbability(1,5);
+        int BSFloor = BSProbability(rng);
+
+        shared_ptr<Game> mainGame = make_shared<Game>(player, rng, BSFloor);
         shared_ptr<TextDisplay> td = make_shared<TextDisplay>(mainGame);
         
         mainGame->initFloor();

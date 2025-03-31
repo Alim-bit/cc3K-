@@ -25,3 +25,24 @@ bool Item::isKnown() { return true; }
 
 // Intentionally empty for non-potion items
 void Item::makeKnown() {  }
+
+bool Item::isProtected() {
+    return protect;
+}
+
+void Item::setProtected(bool b) {
+    protect = b;
+}
+
+int Item::getEnemyX() {
+    return enemyX;
+}
+
+int Item::getEnemyY() {
+    return enemyY;
+}
+
+void Item::setEnemyPos(int newX, int newY) {
+    enemyX = newX;
+    enemyY = newY;
+}

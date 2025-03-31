@@ -25,6 +25,21 @@ bool Enemy::isHostile() { return true; }
 void Enemy::makeHostile() {  }
 void Enemy::resetHostile() {  }
 
+// Only used for dragons
+int Enemy::getItemX() {
+    return itemX;
+}
+
+int Enemy::getItemY() {
+    return itemY;
+}
+
+void Enemy::setItemPos(int newX, int newY) {
+    itemX = newX;
+    itemY = newY;
+}
+
+
 void Enemy::setHP(int newHP) {
     HP = newHP;
 }
@@ -57,3 +72,4 @@ void Enemy::setHolding() {
 bool Enemy::getHolding() {
    return holdingCompass;
 }
+

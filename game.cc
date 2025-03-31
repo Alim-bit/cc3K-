@@ -137,13 +137,33 @@ void Game::initFloor() {
         spawnedGold->setPos(goldX, goldY);
         curFloor->getTile(goldX, goldY)->setItem(spawnedGold);
 
-         /* if (spawnedGold->getName == "DH") {
-            basically make a dragon, then randomize its
-            position to the 8 squares around the gold's
-            position, then make them both part of a 
-            protected item pair.
+        if (spawnedGold->getName() == "DH") {
+            // Spawns dragon and finds position for it in one of 8 tiles
+            // surrounding dragon hoard. Makes dragon and hoard part
+            // of protectedItem pair.
+            shared_ptr<Enemy> dragon = EnemyFactory::createEnemy("Dragon");
+            vector<pair<int, int>> validTiles;
+            for (int i = goldX-1; i <= goldX+1; i++) {
+                for (int j = goldY-1; j <= goldY+1; j++) {
+                    if (i != goldX || j != goldY) {
+                        if (curFloor->getTile(i, j)->getType() == "empty") {
+                            validTiles.emplace_back(make_pair(i,j));
+                        }
+                    }
+                }
+            }
+            shuffle(validTiles.begin(), validTiles.end(), rng);
+            pair<int, int> newCoords = validTiles.at(0);
+            shared_ptr<Tile> newTile = curFloor->getTile(newCoords.first, newCoords.second);
+            newTile->setType(Tile::ENEMY);
+            newTile->setEnemy(dragon);
+            dragon->setPos(newCoords.first, newCoords.second);
+            
+            // giving access to each others' positions
+            spawnedGold->setProtected(true);
+            spawnedGold->setEnemyPos(newCoords.first, newCoords.second);
+            dragon->setItemPos(goldX, goldY);
         }
-        */
     }
 
     // SPAWN ENEMIES
@@ -379,10 +399,31 @@ void Game::move(string dir) {
                 curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
 
             } else if (item->getName() == "DH" || item->getName() == "BS") {
-                // check if protector is gone before
-                // useItem(dir)
-                // if not:
-                actionResult = "You can't collect that right now!";
+                // check if protector is gone before letting player take
+                // the item.
+                shared_ptr<Tile> protectorTile = curFloor->getTile(item->getEnemyX(), item->getEnemyY());
+                // Since all protectors are dragons and dragons are stationary, just check
+                // if a dragon is in that position.
+                if (!(protectorTile->getType() == "enemy" && protectorTile->getEnemy()->getName() == "Dragon")) {
+                    item->setProtected(false);
+                }
+
+                if (!(item->isProtected())) {
+                    useItem(dir);
+                    if (item->getName() == "DH") {
+                        if (player->getRace() == "Orc") {
+                            actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
+                        } else if (player->getRace() == "Dwarf") {
+                            actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an dwarf.";
+                        } else {
+                            actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                        }
+                    } else {
+                        actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
+                    }
+                } else {
+                    actionResult = "Defeat the dragon to collect the item!";
+                }
             } else {
                 actionResult = "You can't walk on that.";
             }
@@ -468,9 +509,6 @@ void Game::attack(string dir) {
 
             // Enemy is not merchant/dragon
             if (!(enemy->getName() == "Merchant" || enemy->getName() == "Dragon")) {
-                // Player ability here
-                // goldScore += player->playerAbility(1);
-                // For now, just gives 1 gold
 
                 if (player->getRace() == "Orc") {
                     goldScore += 0.5;
@@ -539,7 +577,7 @@ void Game::useItem(string dir) {
     string actionResult;
     shared_ptr<Floor> curFloor = getFloor(currentFloor);
 
-    // check itemTile for enemy
+    // check itemTile for item
     shared_ptr<Tile> itemTile = curFloor->getTile(tempX, tempY);
     string itemTileType = itemTile->getType();
 
@@ -588,12 +626,6 @@ void Game::useItem(string dir) {
 }
 
 void Game::enemyMove(shared_ptr<Enemy> enemy) {
-    // If enemy->getName() == "Dragon"
-    // check its associated protectedItem
-    // to see if the player is around it.
-    // If so, become hostile.
-
-
 	if (!(enemy->getMoved())) {
 	    int curX = enemy->getX();
         int curY = enemy->getY();
@@ -602,6 +634,26 @@ void Game::enemyMove(shared_ptr<Enemy> enemy) {
 	    vector<pair<int, int>> validMoves;
 	    bool attack = false;
 	    string actionResult;
+
+        // If enemy->getName() == "Dragon"
+        // check its associated protectedItem
+        // to see if the player is around it.
+        // If so, become hostile.
+        if (enemy->getName() == "Dragon") {
+            int itemX = enemy->getItemX();
+            int itemY = enemy->getItemY();
+            for (int i = itemX-1; i <= itemX+1; i++) {
+                for (int j = itemY-1; j <= itemY+1; j++) {
+                    if (i != itemX || j != itemY) {
+                        if (curFloor->getTile(i, j)->getType() == "player") {
+                            enemy->makeHostile();
+                            break;
+                           } 
+                    }
+                }
+            }
+    
+        }
 
 	    // get enemy's potential moves, stop if player is found
         // unless enemy is a merchant/dragon and is not hostile
@@ -666,7 +718,7 @@ void Game::enemyMove(shared_ptr<Enemy> enemy) {
                 }
             }
 	    }
-        //
+        // Reset dragon's hostility
         if (enemy->getName() == "Dragon") {
             enemy->resetHostile();
         }

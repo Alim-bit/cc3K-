@@ -13,6 +13,12 @@ protected:
     int value;
     int x, y;
 
+    // if the item is protected,
+    // it will have the coordinates of 
+    // the enemy protecting it
+    bool protect;
+    int enemyX, enemyY;
+
 public:
     Item(std::string name, char symbol, int value);
     virtual ~Item() = default;
@@ -27,6 +33,12 @@ public:
     // for potions
     virtual bool isKnown();
     virtual void makeKnown();
+
+    bool isProtected();
+    void setProtected(bool b);
+    int getEnemyX();
+    int getEnemyY();
+    void setEnemyPos(int newX, int newY);
 };
 
 #endif // ITEM_H

@@ -13,6 +13,7 @@ public:
     void resetHostile();
     void makeHostile();
     bool isHostile();
+
 };
 
 #endif

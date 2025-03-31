@@ -322,6 +322,24 @@ public:
             curFloor->getTile(curX, curY)->setType(Tile::EMPTY);
             
             actionResult = "PC moves " + direction + ".";
+
+            // look for potion
+            for (int i = tempX-1; i <= tempX+1; i++) {
+            	for (int j = tempY-1; j <= tempY+1; j++) {
+		    	        if (curFloor->getTile(i, j)->getType() == "item") {
+			                auto item = curFloor->getTile(i, j)->getItem();
+                            if (item->getName() == "RH" || item->getName() == "BA" ||
+                                item->getName() == "BD" || item->getName() == "PH" ||
+                                item->getName() == "WA" || item->getName() == "WD") {
+                                    if (item->isKnown()) {
+                                        actionResult = "PC sees a " + item->getName() + " potion.";
+                                    } else {
+                                        actionResult = "PC sees an unknown potion.";
+                                    }
+                                }
+		   	            } 
+	    	        }
+            	}
         
         // if passage
         } else if (nextTileType == "passage") {
@@ -377,6 +395,11 @@ public:
                 if (item->getName() == "C" || item->getName() == "NG" || 
                     item->getName() == "SH" || item->getName() == "MH") {
                     // Uses item, then walks on to spot where item was
+                    if (item->getName() == "C") {
+                        actionResult = "PC picks up the Compass; the stairs are now visible.";
+                    } else {
+                        actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                    }
                     useItem(dir);
 
                     nextTile->setType(Tile::PLAYER);
@@ -564,13 +587,14 @@ public:
                 } else {
                     // Special function based on race
                     //player->drinkPotion(item->getName());
-			actionResult = "PC drank a potion (not implemented!!)";
+			        actionResult = "PC drank a " + item->getName() + " potion (not implemented!!)";
+				item->makeKnown();
                 }
                 // Remove the item from the tile
                 itemTile->setType(Tile::EMPTY);
                 itemTile->setItem(nullptr);
 
-		setPlayerCommandLine(actionResult);
+		        setPlayerCommandLine(actionResult);
             }
         }
     }

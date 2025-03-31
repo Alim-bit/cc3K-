@@ -7,3 +7,11 @@ PHPotion::PHPotion()
 void PHPotion::pickUp() {
     std::cout << "Picked up a Poison Health Potion" << std::endl;
 }
+
+bool PHPotion::isKnown() {
+    return known;
+}
+
+void PHPotion::makeKnown() {
+    PHPotion::known = true;
+}

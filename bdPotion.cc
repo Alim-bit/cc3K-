@@ -7,3 +7,11 @@ BDPotion::BDPotion()
 void BDPotion::pickUp() {
     std::cout << "Picked up a Boost Defense Potion" << std::endl;
 }
+
+bool BDPotion::isKnown() {
+    return known;
+}
+
+void BDPotion::makeKnown() {
+    BDPotion::known = true;
+}

@@ -7,3 +7,11 @@ WDPotion::WDPotion()
 void WDPotion::pickUp() {
     std::cout << "Picked up a Wound Defense Potion" << std::endl;
 }
+
+bool WDPotion::isKnown() {
+    return known;
+}
+
+void WDPotion::makeKnown() {
+    WDPotion::known = true;
+}

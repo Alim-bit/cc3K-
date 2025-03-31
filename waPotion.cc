@@ -7,3 +7,11 @@ WAPotion::WAPotion()
 void WAPotion::pickUp() {
     std::cout << "Picked up a Wound Attack Potion" << std::endl;
 }
+
+bool WAPotion::isKnown() {
+    return known;
+}
+
+void WAPotion::makeKnown() {
+    WAPotion::known = true;
+}

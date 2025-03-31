@@ -20,3 +20,8 @@ void Item::setPos(int newX, int newY) {
     x = newX;
     y = newY;
 }
+
+bool Item::isKnown() { return true; }
+
+// Intentionally empty for non-potion items
+void Item::makeKnown() {  }

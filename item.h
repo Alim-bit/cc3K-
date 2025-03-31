@@ -10,10 +10,7 @@ protected:
     std::string name;
     char symbol;
 
-    // This is for when floors are submitted
-    // as a command line argument
     int value;
-
     int x, y;
 
 public:
@@ -26,6 +23,10 @@ public:
     int getX() const;
     int getY() const;
     void setPos(int newX, int newY);
+
+    // for potions
+    virtual bool isKnown();
+    virtual void makeKnown();
 };
 
 #endif // ITEM_H

@@ -2,7 +2,7 @@
 #include <iostream>
 
 SmallHoardGold::SmallHoardGold()
-    : Item("SH", 'G', 7) {}
+    : Item("SH", 'G', 2) {}
 
 void SmallHoardGold::pickUp() {
     std::cout << "Picked up a Small Hoard Gold pile" << std::endl;

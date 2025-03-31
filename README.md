@@ -24,7 +24,7 @@
 - generating floors based off a command line argument file
 
 ### **Player Mechanics**
-- Player ability must be applied correctly
+- elf ability
 
 ### **Enemy Class**
 - Implement Dragon hositlity when PC is near its gold (needs protected item implementation)

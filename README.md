@@ -25,7 +25,6 @@
 
 ### **Player Mechanics**
 - Player ability must be applied correctly
-- Proper generation order (IN PROGRESS)
 
 ### **Enemy Class**
 - Implement Dragon hositlity when PC is near its gold (needs protected item implementation)

@@ -10,18 +10,20 @@ protected:
     int HP;
     int ATK;
     int DEF;
-
+    int tempATKBonus; 
+    int tempDEFBonus; 
     int x, y;
     bool inPassage;
 
 public:
     PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
     virtual ~PlayerChar() = default;
-    // virtual void playerAbility() = 0;
 
     int getHP();
     int getATK();
     int getDEF();
+    int getTempATK();
+    int getTempDEF();
     std::string getRace();
 
     void setHP(int newHP);
@@ -30,6 +32,9 @@ public:
     int getY();
     bool isInPassage();
     void setInPassage(bool inout);
+
+    void drinkPotion(const std::string &potionType);
+    void resetTempPotions();
 };
 
 #endif

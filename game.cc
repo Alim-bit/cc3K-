@@ -53,6 +53,9 @@ void Game::initFloor() {
     curFloor->getTile(playerX, playerY)->setType(Tile::PLAYER); 
     player->setPos(playerX, playerY);
 
+    // SET POTIONS
+    player->resetTempPotions();
+
     // SET STAIRS SPAWN
     curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
     //curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
@@ -479,7 +482,7 @@ void Game::attack(string dir) {
     // if enemy
     if (attackTileType == "enemy") {
         shared_ptr<Enemy> enemy = attackTile->getEnemy();
-        int damage = ((100 + 100 + enemy->getDEF() - 1)/(100 + enemy->getDEF())) * player->getATK();
+        int damage = ((100 + 100 + enemy->getDEF() - 1)/(100 + enemy->getDEF())) * (player->getATK() + player->getTempATK());
             
         enemy->setHP(enemy->getHP() - damage);
         ostringstream oss;
@@ -611,9 +614,8 @@ void Game::useItem(string dir) {
                 actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
                 // barrierSuit = true
             } else {
-                // Special function based on race
-                //player->drinkPotion(item->getName());
-			    actionResult = "PC drank a " + item->getName() + " potion (not implemented!!)";
+                player->drinkPotion(item->getName());
+                actionResult = "PC drank a " + item->getName() + " potion.";
 			    item->makeKnown();
             }
             // Remove the item from the tile
@@ -681,7 +683,7 @@ void Game::enemyMove(shared_ptr<Enemy> enemy) {
             int rand = hitChance(rng);
             if (rand > 49) {
                 // The extra (100 + player DEF - 1) is there so it rounds up
-                int damage = ((100 + 100 + player->getDEF() - 1)/(100 + player->getDEF())) * enemy->getATK();
+                int damage = ((100 + 100 + (player->getDEF() + player->getTempDEF()) - 1)/(100 + (player->getDEF() + player->getTempDEF()))) * enemy->getATK();
 
                 // if (BarrierSuit) {
                 // damage = ceil(damage / 2) 

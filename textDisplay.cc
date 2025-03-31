@@ -30,8 +30,8 @@ void TextDisplay::notify() {
 
     cout << "Race: " << player->getRace() << " Gold: " << subject->getGoldScore() << "                                                  Floor " << floorNum << endl;
     cout << "HP: " << player->getHP() << endl;
-    cout << "Atk: " << player->getATK() << endl;
-    cout << "Def: " << player->getDEF() << endl;
+    cout << "Atk: " << (player->getATK() + player->getTempATK()) << endl;
+    cout << "Def: " << (player->getDEF() + player->getTempDEF()) << endl;
     cout << "Action: " << subject->getPlayerCommandLine() << subject->getEnemyCommandLine()  << endl; 
 }
 

@@ -27,13 +27,7 @@
 - elf ability
 
 ### **Enemy Class**
-- Implement Dragon hositlity when PC is near its gold (needs protected item implementation)
+- Done!
 
 ### **Items Class**
-- Implement `usePotion`/pickUp method (must be within 1 block radius of potion)
-- Potions are unknown until used or bought from a merchant (Buying from merchants is optional)
-- Implement permanent vs temp potions:
-  - Stats cannot drop below 0
-  - Temp potions disappear when entering a new floor
-- Protected item implementation
-- Implement major items
+- Done!

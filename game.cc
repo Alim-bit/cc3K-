@@ -256,6 +256,7 @@ string Game::getEnemyCommandLine() {
     return enemyCommandLine;
 }
 
+
 // game logic
 
 void Game::move(string dir) {
@@ -588,7 +589,6 @@ void Game::useItem(string dir) {
         // Get the item from the tile
         auto item = itemTile->getItem();
         if (item) {
-            item->pickUp();
             if (item->getName() == "C") {
                 // When picking up the Compass, reveal the stairs.
                 curFloor->getTile(stairsX, stairsY)->setStairsVisible();
@@ -621,10 +621,12 @@ void Game::useItem(string dir) {
             // Remove the item from the tile
             itemTile->setType(Tile::EMPTY);
             itemTile->setItem(nullptr);
-
-		    setPlayerCommandLine(actionResult);
         }
+    } else {
+        actionResult = "You can't use that!";
     }
+
+    setPlayerCommandLine(actionResult);
 }
 
 void Game::enemyMove(shared_ptr<Enemy> enemy) {

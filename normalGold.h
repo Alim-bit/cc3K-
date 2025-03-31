@@ -6,7 +6,6 @@
 class NormalGold : public Item {
 public:
     NormalGold();
-    virtual void pickUp() override;
 };
 
 #endif // NORMALGOLD_H

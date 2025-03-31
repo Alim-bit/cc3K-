@@ -6,7 +6,6 @@
 class Compass : public Item {
 public:
     Compass();
-    virtual void pickUp() override;
 };
 
 #endif // COMPASS_H

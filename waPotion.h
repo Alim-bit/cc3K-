@@ -7,7 +7,6 @@ class WAPotion : public Item {
     inline static bool known = false;
 public:
     WAPotion();
-    virtual void pickUp() override;
     bool isKnown();
     void makeKnown();
 };

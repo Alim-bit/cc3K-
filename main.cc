@@ -28,7 +28,7 @@ int main() {      // will need cmd line args at some point
             cout << "Unidentified race, please try again." << endl;
             continue;
         }
-
+        
         unsigned seed = chrono::system_clock::now().time_since_epoch().count();
 	    default_random_engine rng{seed};
 

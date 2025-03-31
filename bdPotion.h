@@ -7,7 +7,6 @@ class BDPotion : public Item {
     inline static bool known = false;
 public:
     BDPotion();
-    virtual void pickUp() override;
     bool isKnown();
     void makeKnown();
 };

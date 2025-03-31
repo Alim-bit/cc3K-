@@ -6,7 +6,6 @@
 class DragonHoardGold : public Item {
 public:
     DragonHoardGold();
-    virtual void pickUp() override;
 };
 
 #endif // DRAGONHOARDGOLD_H

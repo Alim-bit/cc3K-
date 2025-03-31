@@ -6,7 +6,6 @@
 class MerchantHoardGold : public Item {
 public:
     MerchantHoardGold();
-    virtual void pickUp() override;
 };
 
 #endif // MERCHANTHOARDGOLD_H

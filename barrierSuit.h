@@ -6,7 +6,6 @@
 class BarrierSuit : public Item {
 public:
     BarrierSuit();
-    virtual void pickUp() override;
 };
 
 #endif // BARRIERSUIT_H

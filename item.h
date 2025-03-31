@@ -22,7 +22,6 @@ protected:
 public:
     Item(std::string name, char symbol, int value);
     virtual ~Item() = default;
-    virtual void pickUp() = 0;
     std::string getName() const;
     char getSymbol() const;
     int getValue() const;

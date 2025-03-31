@@ -31,6 +31,8 @@ class Game : public Subject {
     // See Figure 3 in cc3k+ pdf.
     string playerCommandLine;
     string enemyCommandLine;
+    int stairsX;
+    int stairsY;
 
 public:
     Game(shared_ptr<PlayerChar> player, default_random_engine rng) 
@@ -77,8 +79,8 @@ public:
         // get random spawn for stairs
         vector<vector<int>> stairsChamberBounds = curFloor->getChamberBounds(stairsSpawn);
         vector<int> stairsCoords = getRandomSpawn(stairsChamberBounds);
-        int stairsX = stairsCoords.at(0);
-        int stairsY = stairsCoords.at(1);
+        stairsX = stairsCoords.at(0);
+        stairsY = stairsCoords.at(1);
 
         // SET PLAYER SPAWN
         curFloor->getTile(playerX, playerY)->setType(Tile::PLAYER); 
@@ -365,6 +367,29 @@ public:
             curFloor->getTile(tempX, tempY)->setType(Tile::PLAYER);
             player->setPos(tempX, tempY);
             
+        } else if (nextTileType == "item") {
+            // Get the item from the tile
+            auto item = nextTile->getItem();
+            if (item) {
+                item->pickUp();
+                if (item->getName() == "C") {
+                    // When picking up the Compass, reveal the stairs.
+                    curFloor->getTile(stairsX, stairsY)->setStairsVisible();
+                    actionResult = "PC picks up the Compass; the stairs are now visible.";
+                }
+                else if (item->getName() == "NG" || item->getName() == "SH" ||
+                         item->getName() == "MH" || item->getName() == "DH") {
+                    // For gold items, update the gold score.
+                    goldScore += item->getValue();
+                    actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
+                }
+                else {
+                    actionResult = "PC picks up " + item->getName() + ".";
+                }
+                // Remove the item from the tile
+                nextTile->setType(Tile::EMPTY);
+                nextTile->setItem(nullptr);
+            }
         } else if (nextTileType == "stairs") {
             currentFloor += 1;
 

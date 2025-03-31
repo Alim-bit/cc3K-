@@ -58,7 +58,7 @@ void Game::initFloor() {
 
     // SET STAIRS SPAWN
     curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
-    curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
+    // curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
 
     // SPAWN POTIONS
     int numPotions = 10;
@@ -469,9 +469,9 @@ void Game::move(string dir) {
                 if (!(item->isProtected())) {
                     useItem(dir);
                     if (item->getName() == "DH") {
-                        if (player->getRace() == "Orc") {
+                        if (player->getRace() == "Orc") { // ORC ABILITY
                             actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
-                        } else if (player->getRace() == "Dwarf") {
+                        } else if (player->getRace() == "Dwarf") { // DWARF ABILITY
                             actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an dwarf.";
                         } else {
                             actionResult = "PC picks up gold (" + to_string(item->getValue()) + ").";
@@ -656,10 +656,10 @@ void Game::useItem(string dir) {
                     item->getName() == "MH" || item->getName() == "DH") {
                 // For gold items, update the gold score.
                 // goldScore += player->collectGold(item->getValue());
-                if (player->getRace() == "Orc") {
+                if (player->getRace() == "Orc") { // ORC ABILITY
                     goldScore += static_cast<double>(item->getValue()) / 2;
                     actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was halved as an orc.";
-                } else if (player->getRace() == "Dwarf") {
+                } else if (player->getRace() == "Dwarf") { // DWARF ABILITY
                     goldScore += item->getValue() * 2;
                     actionResult = "PC picks up gold (" + to_string(item->getValue()) + ") which was doubled as an elf.";
                 } else {
@@ -672,8 +672,21 @@ void Game::useItem(string dir) {
                 actionResult = "PC picks up " + item->getName() + "! Damage taken is halved permanently.";
                 player->setBarrierSuit();
             } else {
-                player->drinkPotion(item->getName());
-                actionResult = "PC drank a " + item->getName() + " potion.";
+                // ELF ABILITY
+                if (player->getRace() == "Elf") {
+                    if (item->getName() == "PH") {
+                        player->drinkPotion("RH");
+                    } else if (item->getName() == "WA") {
+                        player->drinkPotion("BA");
+                    } else if (item->getName() == "WD") {
+                        player->drinkPotion("BD");
+                    }
+
+                    actionResult = "PC drank a reversed " + item->getName() + " potion as an elf.";
+                } else {
+                    player->drinkPotion(item->getName());
+                    actionResult = "PC drank a " + item->getName() + " potion.";
+                }
 			    item->makeKnown();
             }
             // Remove the item from the tile

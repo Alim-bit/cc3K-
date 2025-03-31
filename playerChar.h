@@ -10,7 +10,8 @@ protected:
     int HP;
     int ATK;
     int DEF;
-
+    int tempATKBonus; 
+    int tempDEFBonus; 
     int x, y;
     bool inPassage;
 
@@ -18,6 +19,9 @@ public:
     PlayerChar(std::string race, int maxhp, int hp, int atk, int def, int floor);
     virtual ~PlayerChar() = default;
     // virtual void playerAbility() = 0;
+    void drinkPotion(const std::string &potionType);
+
+    void resetTempPotions();
 
     int getHP();
     int getATK();

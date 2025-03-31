@@ -86,6 +86,9 @@ public:
         curFloor->getTile(playerX, playerY)->setType(Tile::PLAYER); 
         player->setPos(playerX, playerY);
 
+        // SET POTIONS
+        player->resetTempPotions();
+
         // SET STAIRS SPAWN
         curFloor->getTile(stairsX, stairsY)->setType(Tile::STAIRS);
         //curFloor->getTile(stairsX, stairsY)->setStairsVisible(); // TEMP GET RID OF, MAKES STAIRS VISIBLE
@@ -587,9 +590,10 @@ public:
                 } else {
                     // Special function based on race
                     //player->drinkPotion(item->getName());
-			        actionResult = "PC drank a " + item->getName() + " potion (not implemented!!)";
-				item->makeKnown();
-                }
+				    player->drinkPotion(item->getName());
+                    actionResult = "PC drank a " + item->getName() + " potion.";
+                    item->makeKnown();
+                } 
                 // Remove the item from the tile
                 itemTile->setType(Tile::EMPTY);
                 itemTile->setItem(nullptr);

@@ -19,8 +19,8 @@ protected:
     // "thing": player, enemy or item.
 
     Type type;
-    shared_ptr<Enemy> enemy;
-    shared_ptr<Item> item;
+    std::shared_ptr<Enemy> enemy;
+    std::shared_ptr<Item> item;
 
     int x, y;
     bool stairsVisible = false;
@@ -30,7 +30,7 @@ public:
     // need args for enemy, item ptr
     Tile(Type type, int x, int y) : type{type}, x{x}, y{y} {};
 
-    string getType() {
+    std::string getType() {
         switch (type) {
             case WS: return "ws"; break;
             case VWALL: return "vWall"; break;
@@ -46,19 +46,32 @@ public:
         }
     }
 
-    char getChar() {
+    std::string getChar() {
+        const std::string RESET = "\033[0m";
+        const std::string BLUE = "\033[34m";   // for player/stairs
+        const std::string RED = "\033[31m";    // for enemies
+        const std::string YELLOW = "\033[33m"; // for treasure
+        const std::string GREEN = "\033[32m";  // for potions
+
         switch (type) {
-            case WS: return ' '; break;
-            case VWALL: return '|'; break;
-            case HWALL: return '-'; break;
-            case PASSAGE: return '#'; break;
-            case DOOR: return '+'; break;
-            case STAIRS: return (stairsVisible) ? '/' : '.'; break;
-            case EMPTY: return '.'; break;
-            case PLAYER: return '@'; break;
-            case ENEMY: return enemy->getSymbol(); break;
-            case ITEM: return item->getSymbol(); break;
-            default: return '?'; break;
+            case WS: return " "; break;
+            case VWALL: return "|"; break;
+            case HWALL: return "-"; break;
+            case PASSAGE: return "#"; break;
+            case DOOR: return "+"; break;
+            case STAIRS: return (stairsVisible) ? BLUE + "/" + RESET : "."; break;
+            case EMPTY: return "."; break;
+            case PLAYER: return BLUE + "@" + RESET; break;
+            case ENEMY: return RED + std::string(1, enemy->getSymbol()) + RESET; break;
+            case ITEM: 
+                if (item->getName() == "NG" || item->getName() == "SH" ||
+                    item->getName() == "MH" || item->getName() == "DH" ||
+                    item->getName() == "C" || item->getName() == "BS") {
+                    return YELLOW + std::string(1, item->getSymbol()) + RESET; 
+                } else {
+                    return GREEN + std::string(1, item->getSymbol()) + RESET; 
+                }
+            default: return "?"; break;
         }
     }
 
@@ -66,19 +79,19 @@ public:
         type = newType;
     }
 
-    void setEnemy(shared_ptr<Enemy> newEnemy) {
+    void setEnemy(std::shared_ptr<Enemy> newEnemy) {
 	    enemy = newEnemy;
     }
 
-    shared_ptr<Enemy> getEnemy() {
+    std::shared_ptr<Enemy> getEnemy() {
         return enemy;
     }
 
-    void setItem(shared_ptr<Item> newItem) {
+    void setItem(std::shared_ptr<Item> newItem) {
 	    item = newItem;
     }
 
-    shared_ptr<Item> getItem() {
+    std::shared_ptr<Item> getItem() {
         return item;
     }
 
